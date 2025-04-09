@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
+import { useApi } from "~/components/api/ApiProvider";
 import { API_BASE_URLS, type EnvType } from "../config";
 
 export default function Home() {
   const ENV_LIST = ["Live", "QA", "Dev"] as const;
   type EnvType = (typeof ENV_LIST)[number];
-
+  
   const [env, setEnv] = useState<EnvType>("Live");
 
   useEffect(() => {
@@ -16,10 +17,20 @@ export default function Home() {
 
   const [id, setId] = useState(""); 
   const [pw, setPw] = useState("");
+  const { post } = useApi();
   
-
-  const handleLogin = () => {
-    alert(`로그인 시도:\nEnv: ${env}\nID: ${id}\nPW: ${pw}`);
+  const handleLogin = async () => {
+    try {
+      const response = await post("/login", {
+        id: id,
+        password: pw,
+      });
+  
+      console.log("로그인 성공!", response);
+    } catch (err) {
+      alert(`로그인 시도:\nEnv: ${env}\nID: ${id}\nPW: ${pw}`);
+      console.error("로그인 실패:", err);
+    }
   };
 
   // 선택 시 저장

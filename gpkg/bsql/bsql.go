@@ -10,8 +10,7 @@ import (
 
 /*
 Exec() INSERT UPDATE DELETE 에서 사용
-결과 값이 필요 없은 SQL 실행에 적합
-
+결과 값이 필요 없는 SQL 실행에 적합
 
 QueryRow 단일행 조회
 반드시 Scan을 통한 값 추출이 필요
@@ -36,10 +35,10 @@ type RDBWrap struct {
 }
 
 var (
-	cfg             map[string]Config
-	RDB             RDBWrap
-	IdentifierTable string = "bigidentity"
-	GameTable       string = "bigauth"
+	cfg        map[string]Config
+	RDB        RDBWrap
+	AdminTable string = "admin"
+	GameTable  string = "bigfoot"
 )
 
 func InitService(config []Config) error {
@@ -67,8 +66,8 @@ func InitService(config []Config) error {
 	return nil
 }
 
-func (r *RDBWrap) GetIdentityDB() *sql.DB {
-	key := "IDENTITY"
+func (r *RDBWrap) GetAdminDB() *sql.DB {
+	key := "ADMIN"
 	return r.getDB(key, cfg[key].ShardCount)
 }
 

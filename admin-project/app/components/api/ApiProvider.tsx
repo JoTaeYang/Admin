@@ -1,6 +1,5 @@
 import { createContext, useContext } from "react";
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+import { API_BASE_URLS } from "~/config";
 
 const defaultHeaders = {
   "Content-Type": "application/json",
@@ -12,7 +11,12 @@ const request = async (
   path: string,
   body?: any
 ) => {
-  const res = await fetch(`${BASE_URL}${path}`, {
+  
+  const stored = localStorage.getItem("env");
+  const env = (stored === "Live" || stored === "QA" || stored === "Dev") ? stored : "Live";
+ 
+
+  const res = await fetch(`${API_BASE_URLS[env]}${path}`, {
     method,
     headers: defaultHeaders,
     body: body ? JSON.stringify(body) : undefined,

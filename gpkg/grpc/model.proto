@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option go_package = "./pt";
+
+package bf;
+
+message LoginRequest {
+    string id = 1                                   [json_name = "id"];
+    string password = 2                             [json_name = "password"];
+}       
+
+message LoginResponse {
+    string token = 1                                [json_name = "token"];
+}

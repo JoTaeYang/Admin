@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/JoTaeYang/Admin/admin-back/handler"
+	"github.com/JoTaeYang/Admin/admin-back/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,12 +30,13 @@ func InitRouter() *gin.Engine {
 
 	r.Use(CORSM())
 
-	LoginRouter := r.Group("/big/admin/login")
+	svc := service.NewLoginService()
+	h := handler.NewLoginHandler(svc)
+
+	LoginRouter := r.Group("/big/admin")
 	{
-
+		LoginRouter.POST("/login", h.Login)
 	}
-
-	_ = LoginRouter
 
 	return r
 }
