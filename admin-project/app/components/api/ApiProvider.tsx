@@ -18,6 +18,7 @@ const request = async (
 
   const res = await fetch(`${API_BASE_URLS[env]}${path}`, {
     method,
+    credentials: "include",
     headers: defaultHeaders,
     body: body ? JSON.stringify(body) : undefined,
   });

@@ -72,7 +72,7 @@ func generateJWT(userID, secretKey string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// 서명된 토큰 문자열 반환
-	tokenString, err := token.SignedString(secretKey)
+	tokenString, err := token.SignedString(converter.ZeroCopyStringToBytes(secretKey))
 	if err != nil {
 		return "", err
 	}

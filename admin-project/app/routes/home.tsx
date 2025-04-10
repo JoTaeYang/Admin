@@ -1,13 +1,17 @@
 import { useState, useEffect } from "react";
 import { useApi } from "~/components/api/ApiProvider";
 import { API_BASE_URLS, type EnvType } from "../config";
+import { useNavigate } from "react-router";
 
 export default function Home() {
   const ENV_LIST = ["Live", "QA", "Dev"] as const;
-  type EnvType = (typeof ENV_LIST)[number];
-  
+  type EnvType = (typeof ENV_LIST)[number];  
   const [env, setEnv] = useState<EnvType>("Live");
-
+  const [id, setId] = useState(""); 
+  const [pw, setPw] = useState("");
+  const { post } = useApi();
+  const navigate = useNavigate();
+  
   useEffect(() => {
     const stored = localStorage.getItem("env");
     if (stored === "Live" || stored === "QA" || stored === "Dev") {
@@ -15,10 +19,6 @@ export default function Home() {
     }
   }, []);
 
-  const [id, setId] = useState(""); 
-  const [pw, setPw] = useState("");
-  const { post } = useApi();
-  
   const handleLogin = async () => {
     try {
       const response = await post("/login", {
@@ -27,6 +27,7 @@ export default function Home() {
       });
   
       console.log("로그인 성공!", response);
+      navigate("/dashboard")
     } catch (err) {
       alert(`로그인 시도:\nEnv: ${env}\nID: ${id}\nPW: ${pw}`);
       console.error("로그인 실패:", err);

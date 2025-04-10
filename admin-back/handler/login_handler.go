@@ -40,6 +40,18 @@ func (h *LoginHandler) Login(c *gin.Context) {
 		return
 	}
 
-	res := &pt.LoginResponse{Token: token}
-	c.JSON(http.StatusOK, res)
+	c.SetCookie(
+		"token",     // 쿠키 이름
+		token,       // 쿠키 값 (JWT)
+		3600,        // 유효 시간(초) → 1시간
+		"/",         // 경로
+		"localhost", // 도메인 (로컬이면 "localhost")
+		false,       // Secure: HTTPS에서만 전송됨
+		true,        // HttpOnly: JS에서 접근 불가
+	)
+
+	//res := &pt.LoginResponse{Token: token}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "success",
+	})
 }
