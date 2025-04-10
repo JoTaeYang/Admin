@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/JoTaeYang/Admin/admin-back/handler"
 	"github.com/JoTaeYang/Admin/admin-back/service"
+	mw "github.com/JoTaeYang/Admin/gpkg/middleware"
+	"github.com/JoTaeYang/Admin/gpkg/model"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,8 +31,10 @@ func InitRouter() *gin.Engine {
 	r := gin.Default()
 
 	r.Use(CORSM())
+	r.Use(mw.AuthMiddleware())
 
-	svc := service.NewLoginService()
+	loader := model.NewLoader()
+	svc := service.NewLoginService(loader, &cfg)
 	h := handler.NewLoginHandler(svc)
 
 	LoginRouter := r.Group("/big/admin")

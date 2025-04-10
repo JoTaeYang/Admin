@@ -1,11 +1,5 @@
 package repo
 
-import "database/sql"
-
-type ISingleRepository[T any] interface {
-	Get(tx *sql.Tx, id string) (*T, error)
-}
-
 type DataContext struct {
 	data map[string]interface{}
 }

@@ -9,18 +9,23 @@ func NewLoader() *Loader {
 	return &Loader{}
 }
 
-func (l *Loader) LoadTx(db *sql.DB, selector *Selector) error {
+func (l *Loader) LoadTx(db *sql.DB, selector *Selector) (map[string]interface{}, error) {
+	result := make(map[string]interface{}, 5)
 
 	tx, err := db.Begin()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	selectList := selector.GetSelect()
 
 	for k, v := range selectList {
-
+		result[k], err = v.Get(tx, selector.Id)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	return nil
+	tx.Commit()
+	return result, nil
 }

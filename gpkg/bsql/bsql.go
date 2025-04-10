@@ -37,7 +37,7 @@ type RDBWrap struct {
 var (
 	cfg        map[string]Config
 	RDB        RDBWrap
-	AdminTable string = "admin"
+	AdminTable string = "manager"
 	GameTable  string = "bigfoot"
 )
 

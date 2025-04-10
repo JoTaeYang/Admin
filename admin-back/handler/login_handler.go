@@ -2,7 +2,7 @@ package handler
 
 import (
 	"io"
-	"log"
+	"net/http"
 
 	"github.com/JoTaeYang/Admin/admin-back/service"
 	"github.com/JoTaeYang/Admin/gpkg/pt"
@@ -21,18 +21,25 @@ func NewLoginHandler(service service.LoginService) *LoginHandler {
 func (h *LoginHandler) Login(c *gin.Context) {
 	req := &pt.LoginRequest{}
 	data, err := io.ReadAll(c.Request.Body)
+
+	errResponse := gin.H{"err": "invalid request"}
+
 	if err != nil {
+		c.JSON(http.StatusBadRequest, errResponse)
 		return
 	}
 	err = protojson.Unmarshal(data, req)
 	if err != nil {
+		c.JSON(http.StatusBadRequest, errResponse)
 		return
 	}
 
-	err = h.service.Login(req.Id, req.Password)
+	token, err := h.service.Login(req.Id, req.Password)
 	if err != nil {
+		c.JSON(http.StatusBadRequest, errResponse)
 		return
 	}
 
-	log.Println(req)
+	res := &pt.LoginResponse{Token: token}
+	c.JSON(http.StatusOK, res)
 }

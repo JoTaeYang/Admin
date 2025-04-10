@@ -1,31 +1,27 @@
 package model
 
-import "github.com/JoTaeYang/Admin/gpkg/repo"
+import "database/sql"
 
 type Selector struct {
 	Id        string
-	selection map[string]interface{}
+	selection map[string]ISingleRepository
+}
+
+type ISingleRepository interface {
+	Get(tx *sql.Tx, id string) (interface{}, error)
 }
 
 func NewSelector(id string) *Selector {
 	return &Selector{
 		Id:        id,
-		selection: make(map[string]interface{}, 5),
+		selection: make(map[string]ISingleRepository, 5),
 	}
 }
 
-func AddSelect[T any](selector *Selector, key string, data interface{}) {
-	var ok bool
-	if _, ok = data.(repo.ISingleRepository[T]); ok {
-		selector.addSingle(key, data)
-		return
-	}
-}
-
-func (s *Selector) addSingle(key string, data interface{}) {
+func (s *Selector) AddSingle(key string, data ISingleRepository) {
 	s.selection[key] = data
 }
 
-func (s *Selector) GetSelect() map[string]interface{} {
+func (s *Selector) GetSelect() map[string]ISingleRepository {
 	return s.selection
 }

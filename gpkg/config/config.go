@@ -16,8 +16,13 @@ type Configs struct {
 	MySQLDB []bsql.Config `yaml:"mysqldb,omitempty"`
 
 	Server struct {
-		Port string `yaml:"port"`
+		Port      string `yaml:"port"`
+		SecretKey string `yaml:"secret_key"`
 	} `yaml:"setting"`
+}
+
+func (c *Configs) GetSecretKey() string {
+	return c.Server.SecretKey
 }
 
 func readConfig(conf *Configs, path string) error {
