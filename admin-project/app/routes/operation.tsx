@@ -1,8 +1,7 @@
-import { Outlet } from "react-router";
 
+import {  Outlet } from "react-router";
 
-
-export default function DashboardLayout() {
+export default function OperationLayout() {
   return (
     <div>
       {/* 하위 탭 콘텐츠 영역 */}

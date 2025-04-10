@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
 import { API_BASE_URLS } from "~/config";
+import { useNavigate } from "react-router";
 
 
 export const useAuth = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); // null: 아직 판단 안 됨
   const stored = localStorage.getItem("env");
+  const navigate = useNavigate();
+
+  if (stored === null)
+  {
+    navigate("")
+  }
+
   const env = (stored === "Live" || stored === "QA" || stored === "Dev") ? stored : "Live";
 
   useEffect(() => {
