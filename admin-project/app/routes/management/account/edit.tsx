@@ -1,0 +1,52 @@
+import { useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router";
+import { FormLayout, useFormContext } from "~/components/Form/FormContext";
+import { FormInput } from "~/components/Form/FormInput";
+import { SaveBtn } from "~/components/Form/SaveBtn";
+import BackButton from "~/components/common/BackButton";
+
+
+function AccountFormContent() {
+    const location = useLocation();
+    const { setValue } = useFormContext();
+
+    const record = location.state as { email: string; username: string; role: string };
+    const initializedRef = useRef(false);
+    useEffect(() => {
+        if (!initializedRef.current && record) {
+            setValue("email", record.email);
+            setValue("username", record.username);
+            setValue("role", record.role);
+            initializedRef.current = true;
+        }
+    }, [record, setValue]);
+
+    return (
+        <>
+            <FormInput name="email" placeholder="이메일" />
+            <FormInput name="username" placeholder="사용자 이름" />
+            <FormInput name="role" placeholder="권한" />
+            <SaveBtn endpoint="/api/account/edit/1" />
+        </>
+    );
+}
+
+export default function AccountEditPage() {
+    const navigate = useNavigate();
+
+    return (
+        <div>
+            <div className="w-[400px] ml-4 mt-8">
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-bold">계정 수정</h2>
+                    <BackButton label = "<-"/>
+                </div>
+
+                <FormLayout>
+                    <AccountFormContent />
+                </FormLayout>
+            </div>
+        </div>
+
+    );
+}

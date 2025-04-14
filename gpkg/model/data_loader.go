@@ -17,9 +17,9 @@ func (l *Loader) LoadTx(db *sql.DB, selector *Selector) (map[string]interface{},
 		return nil, err
 	}
 
-	selectList := selector.GetSelect()
+	singleList := selector.GetSingle()
 
-	for k, v := range selectList {
+	for k, v := range singleList {
 		result[k], err = v.Get(tx, selector.Id)
 		if err != nil {
 			return nil, err

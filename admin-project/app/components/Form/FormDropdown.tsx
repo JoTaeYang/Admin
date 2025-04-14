@@ -1,14 +1,18 @@
 import { useState, useEffect } from "react";
+import { useFormContext } from "./FormContext";
+
 import dropdownData from "./dropdownData.json";
 
-interface DropDownProps {
+interface FormDropDownProps {
     tab: string;    
+    name? : string;
     placeholder?: string;
     onChange? : (value : string) => void;
 }
   
 
-export default function DropDown({ tab, placeholder = "select", onChange } : DropDownProps) {
+export default function FormDropDown({ tab, name, placeholder = "select", onChange } : FormDropDownProps) {
+  const { values, setValue } = useFormContext();
   const [selected, setSelected] = useState<string>("UID");
   const [open, setOpen] = useState<boolean>(false);
   const [items, setItems] = useState<string[]>([]);
@@ -21,8 +25,9 @@ export default function DropDown({ tab, placeholder = "select", onChange } : Dro
 
   const handleSelect = (value: string) => {
     setSelected(value);
+    if (name != null)
+        setValue(name, value)    
     setOpen(false);
-
     if (onChange) onChange(value)
   };
 

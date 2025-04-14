@@ -37,14 +37,26 @@ func InitRouter() *gin.Engine {
 
 	loader := model.NewLoader()
 	svc := service.NewLoginService(loader, &cfg)
-	h := handler.NewLoginHandler(svc)
 
-	LoginRouter := r.Group("/big/admin")
+	url := "/big/admin"
+
+	LoginRouter := r.Group(url)
 	{
+		h := handler.NewLoginHandler(svc)
 		LoginRouter.POST("/login", h.Login)
 	}
 
-	CheckRouter := r.Group("/big/admin")
+	ManagementRouter := r.Group(url + "/management")
+	{
+		ManageManagerRouter := ManagementRouter.Group("/account")
+		{
+			h := handler.NewManagerHandler(svc)
+			ManageManagerRouter.GET("/list", h.GetManagerList)
+		}
+
+	}
+
+	CheckRouter := r.Group(url)
 	{
 		CheckRouter.GET("/me", func(c *gin.Context) {
 			c.JSON(http.StatusOK, nil)
