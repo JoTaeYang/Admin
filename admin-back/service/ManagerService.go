@@ -1,6 +1,8 @@
 package service
 
 import (
+	"log"
+
 	"github.com/JoTaeYang/Admin/gpkg/bsql"
 	"github.com/JoTaeYang/Admin/gpkg/config"
 	"github.com/JoTaeYang/Admin/gpkg/model"
@@ -32,6 +34,7 @@ func (s *managerService) Get() error {
 
 	results, err := s.loader.LoadTx(db, selector)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 

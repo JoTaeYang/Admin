@@ -18,9 +18,17 @@ func (l *Loader) LoadTx(db *sql.DB, selector *Selector) (map[string]interface{},
 	}
 
 	singleList := selector.GetSingle()
+	rowList := selector.GetRaw()
 
 	for k, v := range singleList {
 		result[k], err = v.Get(tx, selector.Id)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	for k, v := range rowList {
+		result[k], err = v.Get(tx)
 		if err != nil {
 			return nil, err
 		}

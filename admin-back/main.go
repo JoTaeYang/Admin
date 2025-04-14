@@ -50,6 +50,7 @@ func InitRouter() *gin.Engine {
 	{
 		ManageManagerRouter := ManagementRouter.Group("/account")
 		{
+			svc := service.NewManagerService(loader, &cfg)
 			h := handler.NewManagerHandler(svc)
 			ManageManagerRouter.GET("/list", h.GetManagerList)
 		}

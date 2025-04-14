@@ -29,7 +29,7 @@ func (r *ManagerListRepository) Get(tx *sql.Tx) (interface{}, error) {
 
 	var m model.Manager
 	for rows.Next() {
-		if err := rows.Scan(&m.ID, &m.Grade, &m.Name, &m.Password, &m.CreateAt, &m.UpdateAt); err != nil {
+		if err := rows.Scan(&m.ID, &m.Grade, &m.Name, &m.Password, &m.CreateAt, &m.UpdateAt, &m.Ttl); err != nil {
 			return nil, err
 		}
 		log.Println(m)

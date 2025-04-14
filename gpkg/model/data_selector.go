@@ -20,6 +20,7 @@ func NewSelector(id string) *Selector {
 	return &Selector{
 		Id:     id,
 		single: make(map[string]ISingleRepository, 5),
+		raw:    make(map[string]IRawRepository, 5),
 	}
 }
 

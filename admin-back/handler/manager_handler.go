@@ -9,16 +9,21 @@ import (
 )
 
 type ManagerHandler struct {
-	service service.LoginService
+	service service.ManagerService
 }
 
-func NewManagerHandler(service service.LoginService) *ManagerHandler {
+func NewManagerHandler(service service.ManagerService) *ManagerHandler {
 	return &ManagerHandler{service: service}
 }
 
 func (h *ManagerHandler) GetManagerList(c *gin.Context) {
 	log.Println("Hello GetManager")
-	//res := &pt.LoginResponse{Token: token}
+
+	err := h.service.Get()
+	if err != nil {
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "success",
 	})
