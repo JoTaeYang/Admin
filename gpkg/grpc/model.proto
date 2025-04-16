@@ -12,3 +12,12 @@ message LoginRequest {
 message LoginResponse {
     string token = 1                                [json_name = "token"];
 }
+
+message ManagerCreateRequest {
+    string id = 1                                   [json_name = "id"];
+    string name = 2                                 [json_name = "name"];
+    string grade = 3                                [json_name = "grade"];
+}
+
+message ManagerCreateResponse {    
+}

@@ -11,11 +11,9 @@ const request = async (
   path: string,
   body?: any
 ) => {
-  
   const stored = localStorage.getItem("env");
   const env = (stored === "Live" || stored === "QA" || stored === "Dev") ? stored : "Live";
- 
-
+  
   const res = await fetch(`${API_BASE_URLS[env]}${path}`, {
     method,
     credentials: "include",
@@ -23,8 +21,11 @@ const request = async (
     body: body ? JSON.stringify(body) : undefined,
   });
 
+
   if (!res.ok) {
     const error = await res.json().catch(() => ({}));
+    console.log(res)
+
     throw new Error(error.message || `API Error: ${res.status}`);
   }
 

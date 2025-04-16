@@ -11,17 +11,27 @@ interface FormDropDownProps {
 }
   
 
-export default function FormDropDown({ tab, name, placeholder = "select", onChange } : FormDropDownProps) {
-  const { values, setValue } = useFormContext();
-  const [selected, setSelected] = useState<string>("UID");
+
+export  function FormDropDown({ tab, name, placeholder = "select", onChange } : FormDropDownProps) {
+  const { values, setValue } = useFormContext();  
+  const [selected, setSelected] = useState<string>("select");
   const [open, setOpen] = useState<boolean>(false);
   const [items, setItems] = useState<string[]>([]);
+  const dynamicMargin = open ? `${items.length * 3}rem` : "1rem";
+
+  
 
   useEffect(() => {
     const data = dropdownData[tab as keyof typeof dropdownData] || [];
-    setItems(data);
-    setOpen(true); // 탭 바뀌면 자동 펼침
-  }, [tab]);
+    setItems(data);          
+    if (values && items.length > 0 && name != null) {      
+      const value = values[name];
+      if (value && items.includes(value)) {
+        setSelected(value);
+      }
+    }
+    setOpen(false); // 탭 바뀌면 자동 펼침
+  }, [tab, values]);
 
   const handleSelect = (value: string) => {
     setSelected(value);
@@ -32,8 +42,8 @@ export default function FormDropDown({ tab, name, placeholder = "select", onChan
   };
 
   return (
-    <div className="inline-block text-left w-52 relative">
-      <label className="font-semibold block mb-1">Custom:</label>
+    <div style={{marginBottom : dynamicMargin}}className={`inline-block text-left w-52 relative`}>
+      <label className="font-semibold block mb-1">{name}</label>
 
       {/* 선택된 항목 */}
       <button
@@ -46,7 +56,7 @@ export default function FormDropDown({ tab, name, placeholder = "select", onChan
 
       {/* 목록 */}
       {open && (
-        <ul className="absolute z-10 w-full bg-white-500 text-black mt-1 rounded shadow overflow-auto max-h-96">
+        <ul className="absolute top-full z-10 w-full bg-white-500 text-black mt-1 rounded shadow overflow-auto max-h-96">
           {items.map((item) => (
             <li
               key={item}

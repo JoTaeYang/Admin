@@ -18,12 +18,10 @@ func NewLoginHandler(service service.LoginService) *LoginHandler {
 	return &LoginHandler{service: service}
 }
 
-func (h *LoginHandler) Login(c *gin.Context) {
+func (h *LoginHandler) Login(c *gin.Context) {	
+	errResponse := gin.H{"err": "invalid request"}
 	req := &pt.LoginRequest{}
 	data, err := io.ReadAll(c.Request.Body)
-
-	errResponse := gin.H{"err": "invalid request"}
-
 	if err != nil {
 		c.JSON(http.StatusBadRequest, errResponse)
 		return

@@ -32,7 +32,7 @@ func NewLoginService(loader *model.Loader, config *config.Configs) LoginService 
 func (s *loginService) Login(id string, pw string) (string, error) {
 	selector := model.NewSelector(id)
 
-	selector.AddSingle("manager", &repo.ManagerRepository{})
+	selector.AddSingle(model.EManager, &repo.ManagerRepository{})
 
 	db := bsql.RDB.GetAdminDB()
 
@@ -41,9 +41,9 @@ func (s *loginService) Login(id string, pw string) (string, error) {
 		return "", err
 	}
 
-	ctx := repo.NewDataContext(results)
+	ctx := model.NewDataContext(results)
 
-	user, ok := repo.GetFromContext[*model.Manager](ctx, "manager")
+	user, ok := model.GetFromContext[*model.Manager](ctx, model.EManager)
 	if !ok {
 		return "", errors.New("not found datas")
 	}

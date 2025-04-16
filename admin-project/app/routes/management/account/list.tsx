@@ -4,36 +4,28 @@ import { List } from "~/components/Table/List";
 import { TextField } from "~/components/Table/TextField";
 import { Datagrid } from "~/components/Table/Datagrid";
 import { useApi } from "~/components/api/ApiProvider";
-
-const dummyAccounts = [
-    { id: 1, email: "admin1@bigf.com", username: "adminMaster", role: "ADMIN" },
-    { id: 2, email: "user2@bigf.com", username: "john_doe", role: "USER" },
-    { id: 3, email: "manager3@bigf.com", username: "pm_lee", role: "MANAGER" },
-    { id: 4, email: "qa4@bigf.com", username: "qa_test", role: "QA" },
-    { id: 5, email: "guest5@bigf.com", username: "guest", role: "GUEST" },
-    { id: 6, email: "ad2min1@bigf.com", username: "adminMaster", role: "ADMIN" },
-    { id: 7, email: "us2er2@bigf.com", username: "john_doe", role: "USER" },
-    { id: 8, email: "ma2nager3@bigf.com", username: "pm_lee", role: "MANAGER" },
-    { id: 9, email: "qa24@bigf.com", username: "qa_test", role: "QA" },
-    { id: 10, email: "gu2est5@bigf.com", username: "guest", role: "GUEST" },
-];
-
+import { type Manager } from "~/types/Manager";
+import { ManagerAPI } from "./endpoint";
 
 export default function AccountListPage() {
-    const [accounts, setAccounts] = useState<any[]>([]);
     const navigate = useNavigate();
-    const headerArr = ["Email", "Username", "Role", "Action"]
+    const headerArr = ["id", "grade", "name", "create_at", "update_at","Action"]
     const columnWidth = `w-[${100 / headerArr.length}%]`;
     const { get } = useApi();
-
+    const [accounts, setAccounts] = useState<Manager[]>([]);
 
     useEffect(() => {        
-        const response =  get("/management/account/list");
-      
-        fetch("/api/account/list")
-          .then((res) => res.json())
-          .then(setAccounts)
-          .catch(console.error);
+        async function fetchList() {
+            try {
+                const response = await get(ManagerAPI.list);
+                console.log(response.data)
+                setAccounts(response.data);
+            }
+            catch(err) {
+                alert(`invalid request`);
+            }            
+        }        
+        fetchList();
     }, []);
 
     return (
@@ -53,9 +45,11 @@ export default function AccountListPage() {
                     <Datagrid headers={headerArr}>
                         {rows.map((record) => (
                             <tr key={record.id}>
-                                <TextField className={columnWidth} record={record} source="email" />
-                                <TextField className={columnWidth} record={record} source="username" />
-                                <TextField className={columnWidth} record={record} source="role" />                                
+                                <TextField className={columnWidth} record={record} source="id" />
+                                <TextField className={columnWidth} record={record} source="grade" />
+                                <TextField className={columnWidth} record={record} source="name" />                                
+                                <TextField className={columnWidth} record={record} source="create_at" />    
+                                <TextField className={columnWidth} record={record} source="update_at" />    
                                 <td className="px-4 py-2 border-b">
                                     <button
                                         onClick={() =>

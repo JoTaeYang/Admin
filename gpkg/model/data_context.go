@@ -1,16 +1,16 @@
-package repo
+package model
 
 type DataContext struct {
-	data map[string]interface{}
+	data map[EModel]interface{}
 }
 
-func NewDataContext(raw map[string]interface{}) *DataContext {
+func NewDataContext(raw map[EModel]interface{}) *DataContext {
 	return &DataContext{
 		data: raw,
 	}
 }
 
-func GetFromContext[T any](ctx *DataContext, key string) (T, bool) {
+func GetFromContext[T any](ctx *DataContext, key EModel) (T, bool) {
 	val, ok := ctx.data[key]
 	if !ok {
 		var zero T

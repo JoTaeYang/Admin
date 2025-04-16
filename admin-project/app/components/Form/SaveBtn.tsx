@@ -1,18 +1,18 @@
 import { useFormContext } from "./FormContext";
+import { useApi } from "../api/ApiProvider";
 
 export  function SaveBtn({ endpoint, onSuccess }: { endpoint: string; onSuccess?: () => void }) {
     const { values } = useFormContext();
-  
+    const { post } = useApi();
+
     const handleClick = async () => {
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-  
-      if (res.ok && onSuccess) {
+      const res = await post(endpoint, values);
+        
+      if (res.message === "success" && onSuccess) {    
+        console.log("check")
         onSuccess();
       }
+      
     };
   
     return (

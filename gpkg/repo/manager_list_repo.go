@@ -2,8 +2,6 @@ package repo
 
 import (
 	"database/sql"
-	"errors"
-	"log"
 	"strings"
 
 	"github.com/JoTaeYang/Admin/gpkg/bsql"
@@ -15,7 +13,7 @@ type ManagerListRepository struct {
 
 func (r *ManagerListRepository) Get(tx *sql.Tx) (interface{}, error) {
 	queries := []string{
-		`SELECT * FROM`,
+		`SELECT id, grade, name, created_at, updated_at FROM`,
 		bsql.AdminTable,
 	}
 
@@ -27,17 +25,18 @@ func (r *ManagerListRepository) Get(tx *sql.Tx) (interface{}, error) {
 	}
 	defer rows.Close()
 
-	var m model.Manager
+	mList := make([]*model.Manager, 0, 5)
 	for rows.Next() {
-		if err := rows.Scan(&m.ID, &m.Grade, &m.Name, &m.Password, &m.CreateAt, &m.UpdateAt, &m.Ttl); err != nil {
+		m := model.Manager{}
+		if err := rows.Scan(&m.ID, &m.Grade, &m.Name, &m.CreateAt, &m.UpdateAt); err != nil {
 			return nil, err
 		}
-		log.Println(m)
+		mList = append(mList, &m)
 	}
 
-	if m.ID == "" {
-		return nil, errors.New("not found")
-	}
+	return mList, nil
+}
 
-	return &m, nil
+func (r *ManagerListRepository) GetCache(id string) (interface{}, error) {
+	return nil, nil
 }

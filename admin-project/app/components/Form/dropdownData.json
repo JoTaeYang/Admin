@@ -2,5 +2,10 @@
     "users.search.type" : [
         "UID",
         "NICK NAME"
+    ],
+    "manager.grade.type" : [
+        "master",
+        "editor",
+        "viewer"
     ]
 }

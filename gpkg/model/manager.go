@@ -1,5 +1,10 @@
 package model
 
+type IModel interface {
+	GetTable() string
+	GetCreate() []interface{}
+}
+
 type Manager struct {
 	ID       string      `json:"id"`
 	Grade    string      `json:"grade"`
@@ -8,4 +13,14 @@ type Manager struct {
 	CreateAt string      `json:"create_at"`
 	UpdateAt string      `json:"update_at"`
 	Ttl      interface{} `json:"ttl"`
+}
+
+func (m *Manager) GetTable() string {
+	return "manager"
+}
+
+func (m *Manager) GetCreate() []interface{} {
+	return []interface{}{
+		m.ID, m.Grade, m.Name, m.Password,
+	}
 }

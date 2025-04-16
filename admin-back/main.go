@@ -53,6 +53,7 @@ func InitRouter() *gin.Engine {
 			svc := service.NewManagerService(loader, &cfg)
 			h := handler.NewManagerHandler(svc)
 			ManageManagerRouter.GET("/list", h.GetManagerList)
+			ManageManagerRouter.POST("/create", h.PutManager)
 		}
 
 	}
