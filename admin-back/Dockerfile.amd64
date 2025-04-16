@@ -1,0 +1,12 @@
+FROM golang:alpine AS builder
+
+WORKDIR /root/app
+
+COPY admin-back.exe /root/app/admin-back
+COPY config.yaml /root/app/config
+
+RUN go env -w CGO_ENABLED=0
+
+RUN chmod +x admin-back
+
+CMD "./admin-back"

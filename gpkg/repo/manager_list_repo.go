@@ -14,6 +14,9 @@ import (
 type ManagerListRepository struct {
 }
 
+/*
+TODO :: LIMIT와 OFFSET 적용이 필요함
+*/
 func (r *ManagerListRepository) Get(tx *sql.Tx) (interface{}, error) {
 	queries := []string{
 		`SELECT id, grade, name, created_at, updated_at FROM`,
