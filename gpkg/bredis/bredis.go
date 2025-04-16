@@ -19,29 +19,41 @@ type RedisWrap struct {
 }
 
 var (
-	appName string
-	Redis   RedisWrap
+	AppName string
+	R       RedisWrap
 )
 
 func InitService(cfg Config) error {
-	appName = cfg.AppName
+	AppName = cfg.AppName
 
-	Redis.WriteRedisCli = redis.NewClusterClient(&redis.ClusterOptions{
+	R.WriteRedisCli = redis.NewClusterClient(&redis.ClusterOptions{
 		Addrs:    cfg.Addr,
 		PoolSize: 10,
 	})
-	if Redis.WriteRedisCli == nil {
+	if R.WriteRedisCli == nil {
 		return errors.New("create redis read cli error")
 	}
 
-	Redis.ReadRedisCli = redis.NewClusterClient(&redis.ClusterOptions{
+	R.ReadRedisCli = redis.NewClusterClient(&redis.ClusterOptions{
 		Addrs:    cfg.Addr,
 		PoolSize: 10,
 	})
-	if Redis.ReadRedisCli == nil {
+	if R.ReadRedisCli == nil {
 		return errors.New("create redis write cli error")
 	}
-	log.Println(Redis.ReadRedisCli.Ping(context.Background()))
+	log.Println(R.ReadRedisCli.Ping(context.Background()))
 
 	return nil
+}
+
+func LoadData(key string, argv []string, pipe *redis.Pipeliner) {
+	(*pipe).Eval(context.Background(), getSingleData, []string{key}, argv)
+}
+
+func LoadZSet(key string, argv []string, pipe *redis.Pipeliner) {
+	(*pipe).Eval(context.Background(), getZSetData, []string{key}, argv)
+}
+
+func AddZSet(key string, argv []string, pipe *redis.Pipeliner) {
+	(*pipe).Eval(context.Background(), setZSetData, []string{key}, argv)
 }

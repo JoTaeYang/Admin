@@ -1,6 +1,10 @@
 package model
 
-import "database/sql"
+import (
+	"database/sql"
+
+	"github.com/redis/go-redis/v9"
+)
 
 type Selector struct {
 	Id     string
@@ -10,12 +14,12 @@ type Selector struct {
 
 type ISingleRepository interface {
 	Get(tx *sql.Tx, id string) (interface{}, error)
-	GetCache(id string) (interface{}, error)
+	GetCache(key EModel, id string, pipe *redis.Pipeliner) (interface{}, error)
 }
 
 type IRawRepository interface {
 	Get(tx *sql.Tx) (interface{}, error)
-	GetCache(id string) (interface{}, error)
+	GetCache(key EModel, id string, pipe *redis.Pipeliner) (interface{}, error)
 }
 
 func NewSelector(id string) *Selector {

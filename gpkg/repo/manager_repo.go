@@ -5,15 +5,30 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/JoTaeYang/Admin/gpkg/bredis"
 	"github.com/JoTaeYang/Admin/gpkg/bsql"
+	"github.com/JoTaeYang/Admin/gpkg/converter"
 	"github.com/JoTaeYang/Admin/gpkg/model"
+	"github.com/redis/go-redis/v9"
 )
 
 type ManagerRepository struct {
 }
 
-func (r *ManagerRepository) GetCache(id string) (interface{}, error) {
+func (r *ManagerRepository) GetCache(key model.EModel, id string, pipe *redis.Pipeliner) (interface{}, error) {
+	id = `{` + id + `}`
+	dataKey := model.EModelMapStr[key]
+	list := []string{
+		bredis.AppName,
+		id,
+		dataKey,
+	}
 
+	keyList := strings.Join(list, ":")
+
+	argv := []string{converter.IntToStr(3600), dataKey}
+
+	bredis.LoadData(keyList, argv, pipe)
 	return nil, nil
 }
 

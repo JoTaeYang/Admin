@@ -4,8 +4,11 @@ import (
 	"database/sql"
 	"strings"
 
+	"github.com/JoTaeYang/Admin/gpkg/bredis"
 	"github.com/JoTaeYang/Admin/gpkg/bsql"
+	"github.com/JoTaeYang/Admin/gpkg/converter"
 	"github.com/JoTaeYang/Admin/gpkg/model"
+	"github.com/redis/go-redis/v9"
 )
 
 type ManagerListRepository struct {
@@ -37,6 +40,39 @@ func (r *ManagerListRepository) Get(tx *sql.Tx) (interface{}, error) {
 	return mList, nil
 }
 
-func (r *ManagerListRepository) GetCache(id string) (interface{}, error) {
+func (r *ManagerListRepository) GetCache(key model.EModel, id string, pipe *redis.Pipeliner) (interface{}, error) {
+	id = `{` + id + `}`
+	dataKey := model.EModelMapStr[key]
+	list := []string{
+		bredis.AppName,
+		id,
+		dataKey,
+	}
+
+	keyList := strings.Join(list, ":")
+
+	argv := []string{converter.IntToStr(3600), dataKey}
+
+	bredis.LoadZSet(keyList, argv, pipe)
+	return nil, nil
+}
+
+func (r *ManagerListRepository) UpdateCache(key model.EModel, id string, pipe *redis.Pipeliner, data []model.IModel) (interface{}, error) {
+	id = `{` + id + `}`
+	dataKey := model.EModelMapStr[key]
+	list := []string{
+		bredis.AppName,
+		id,
+		dataKey,
+	}
+
+	keyList := strings.Join(list, ":")
+
+	argv := []string{converter.IntToStr(3600)}
+	for _, v := range data {
+		argv = append(argv, v.GetJSON())
+	}
+
+	bredis.AddZSet(keyList, argv, pipe)
 	return nil, nil
 }
