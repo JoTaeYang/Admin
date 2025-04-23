@@ -35,10 +35,11 @@ type RDBWrap struct {
 }
 
 var (
-	cfg        map[string]Config
-	RDB        RDBWrap
-	AdminTable string = "manager"
-	GameTable  string = "bigfoot"
+	cfg           map[string]Config
+	RDB           RDBWrap
+	AdminTable    string = "manager"
+	GameTable     string = "fishtest"
+	IdentityTable string = "identity"
 )
 
 func InitService(config []Config) error {
@@ -74,6 +75,11 @@ func (r *RDBWrap) GetAdminDB() *sql.DB {
 func (r *RDBWrap) GetGameDB(shard int32) *sql.DB {
 	key := "GAME"
 	return r.getDB(key, shard)
+}
+
+func (r *RDBWrap) GetIdentityDB() *sql.DB {
+	key := "IDENTITY"
+	return r.getDB(key, 1)
 }
 
 func (r *RDBWrap) GetGameShardIndex() int32 {

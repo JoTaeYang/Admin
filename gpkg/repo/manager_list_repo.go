@@ -73,7 +73,7 @@ func (r *ManagerListRepository) UpdateCache(key model.EModel, id string, pipe *r
 
 	argv := []string{converter.IntToStr(3600)}
 	for _, v := range data {
-		argv = append(argv, v.GetJSON())
+		argv = append(argv, model.GetJSON(v))
 	}
 
 	bredis.AddZSet(keyList, argv, pipe)

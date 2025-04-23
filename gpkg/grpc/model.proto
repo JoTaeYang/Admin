@@ -4,6 +4,19 @@ option go_package = "./pt";
 
 package bf;
 
+import "data.proto";
+
+
+message ManagerCreateRequest {
+    string id = 1                                   [json_name = "id"];
+    string name = 2                                 [json_name = "name"];
+    string grade = 3                                [json_name = "grade"];
+}
+
+message ManagerCreateResponse {    
+}
+
+
 message LoginRequest {
     string id = 1                                   [json_name = "id"];
     string password = 2                             [json_name = "password"];
@@ -13,11 +26,27 @@ message LoginResponse {
     string token = 1                                [json_name = "token"];
 }
 
-message ManagerCreateRequest {
-    string id = 1                                   [json_name = "id"];
-    string name = 2                                 [json_name = "name"];
-    string grade = 3                                [json_name = "grade"];
+
+message LoadRequest {
+
 }
 
-message ManagerCreateResponse {    
+message LoadResponse {
+    map<int32, DataItem> Datas = 1;
+}
+
+message AuthLoginRequest {
+    string uid = 1                                  [json_name = "uid"];
+}
+
+message AuthLoginResponse {
+    
+}
+
+message AuthSignRequest {
+    string uid = 1                                  [json_name = "uid"];
+}
+
+message AuthSignResponse {
+    
 }

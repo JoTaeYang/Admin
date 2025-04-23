@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option go_package = "./pt";
+
+package bf;
+
+message Data {
+    enum T {
+        NONE = 0;
+        AUTH = 1;
+    }    
+}
+
+message Auth {
+
+}
+
+message DataItem {
+    oneof item {
+        Auth auth = 1;
+    }
+}
+

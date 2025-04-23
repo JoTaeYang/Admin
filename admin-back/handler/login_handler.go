@@ -7,7 +7,6 @@ import (
 	"github.com/JoTaeYang/Admin/admin-back/service"
 	"github.com/JoTaeYang/Admin/gpkg/pt"
 	"github.com/gin-gonic/gin"
-	"google.golang.org/protobuf/encoding/protojson"
 )
 
 type LoginHandler struct {
@@ -18,7 +17,7 @@ func NewLoginHandler(service service.LoginService) *LoginHandler {
 	return &LoginHandler{service: service}
 }
 
-func (h *LoginHandler) Login(c *gin.Context) {	
+func (h *LoginHandler) Login(c *gin.Context) {
 	errResponse := gin.H{"err": "invalid request"}
 	req := &pt.LoginRequest{}
 	data, err := io.ReadAll(c.Request.Body)
@@ -26,7 +25,8 @@ func (h *LoginHandler) Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, errResponse)
 		return
 	}
-	err = protojson.Unmarshal(data, req)
+
+	err = req.Unmarshal(data)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, errResponse)
 		return

@@ -7,7 +7,6 @@ import (
 	"github.com/JoTaeYang/Admin/admin-back/service"
 	"github.com/JoTaeYang/Admin/gpkg/pt"
 	"github.com/gin-gonic/gin"
-	"google.golang.org/protobuf/encoding/protojson"
 )
 
 type ManagerHandler struct {
@@ -37,7 +36,7 @@ func (h *ManagerHandler) PutManager(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, errResponse)
 		return
 	}
-	err = protojson.Unmarshal(data, req)
+	err = req.Unmarshal(data)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, errResponse)
 		return

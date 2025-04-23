@@ -24,6 +24,12 @@ func (l *Loader) LoadTx(db *sql.DB, selector *Selector) (map[EModel]interface{},
 		return nil, err
 	}
 
+	defer func() {
+		if err := tx.Rollback(); err != nil && err != sql.ErrTxDone {
+			log.Printf("rollback failed : %v", err)
+		}
+	}()
+
 	singleList := selector.GetSingle()
 	rowList := selector.GetRaw()
 

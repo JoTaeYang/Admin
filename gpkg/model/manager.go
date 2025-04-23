@@ -1,17 +1,5 @@
 package model
 
-import (
-	"encoding/json"
-
-	"github.com/JoTaeYang/Admin/gpkg/converter"
-)
-
-type IModel interface {
-	GetTable() string
-	GetCreate() []interface{}
-	GetJSON() string
-}
-
 type Manager struct {
 	ID       string      `json:"id"`
 	Grade    string      `json:"grade"`
@@ -30,9 +18,4 @@ func (m *Manager) GetCreate() []interface{} {
 	return []interface{}{
 		m.ID, m.Grade, m.Name, m.Password,
 	}
-}
-
-func (m *Manager) GetJSON() string {
-	jsonStr, _ := json.Marshal(m)
-	return converter.ZeroCopyByteToString(jsonStr)
 }
