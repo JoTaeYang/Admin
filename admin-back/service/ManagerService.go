@@ -47,7 +47,7 @@ func (s *managerService) Get(c *gin.Context) ([]*model.Manager, error) {
 	selector := model.NewSelector(id)
 
 	repo := &repo.ManagerListRepository{}
-	selector.AddRaw(model.EManagerList, repo)
+	selector.AddMulti(model.EManagerList, repo)
 
 	db := bsql.RDB.GetAdminDB()
 

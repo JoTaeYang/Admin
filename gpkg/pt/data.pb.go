@@ -25,18 +25,21 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 type Data_T int32
 
 const (
-	Data_NONE Data_T = 0
-	Data_AUTH Data_T = 1
+	Data_NONE     Data_T = 0
+	Data_PROFILE  Data_T = 1
+	Data_CURRENCY Data_T = 2
 )
 
 var Data_T_name = map[int32]string{
 	0: "NONE",
-	1: "AUTH",
+	1: "PROFILE",
+	2: "CURRENCY",
 }
 
 var Data_T_value = map[string]int32{
-	"NONE": 0,
-	"AUTH": 1,
+	"NONE":     0,
+	"PROFILE":  1,
+	"CURRENCY": 2,
 }
 
 func (x Data_T) String() string {
@@ -45,6 +48,37 @@ func (x Data_T) String() string {
 
 func (Data_T) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_871986018790d2fd, []int{0, 0}
+}
+
+type Currency_T int32
+
+const (
+	Currency_NONE     Currency_T = 0
+	Currency_GOLD     Currency_T = 1
+	Currency_FREECASH Currency_T = 2
+	Currency_CASH     Currency_T = 3
+)
+
+var Currency_T_name = map[int32]string{
+	0: "NONE",
+	1: "GOLD",
+	2: "FREECASH",
+	3: "CASH",
+}
+
+var Currency_T_value = map[string]int32{
+	"NONE":     0,
+	"GOLD":     1,
+	"FREECASH": 2,
+	"CASH":     3,
+}
+
+func (x Currency_T) String() string {
+	return proto.EnumName(Currency_T_name, int32(x))
+}
+
+func (Currency_T) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_871986018790d2fd, []int{2, 0}
 }
 
 type Data struct {
@@ -83,21 +117,25 @@ func (m *Data) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Data proto.InternalMessageInfo
 
-type Auth struct {
+type Profile struct {
+	UserId          string `protobuf:"bytes,1,opt,name=user_id,proto3" json:"user_id,omitempty"`
+	Name            string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	NameChangeAt    int64  `protobuf:"varint,3,opt,name=name_change_at,proto3" json:"name_change_at,omitempty"`
+	NameChangeCount int64  `protobuf:"varint,4,opt,name=name_change_count,proto3" json:"name_change_count,omitempty"`
 }
 
-func (m *Auth) Reset()         { *m = Auth{} }
-func (m *Auth) String() string { return proto.CompactTextString(m) }
-func (*Auth) ProtoMessage()    {}
-func (*Auth) Descriptor() ([]byte, []int) {
+func (m *Profile) Reset()         { *m = Profile{} }
+func (m *Profile) String() string { return proto.CompactTextString(m) }
+func (*Profile) ProtoMessage()    {}
+func (*Profile) Descriptor() ([]byte, []int) {
 	return fileDescriptor_871986018790d2fd, []int{1}
 }
-func (m *Auth) XXX_Unmarshal(b []byte) error {
+func (m *Profile) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *Auth) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *Profile) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_Auth.Marshal(b, m, deterministic)
+		return xxx_messageInfo_Profile.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -107,22 +145,111 @@ func (m *Auth) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *Auth) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Auth.Merge(m, src)
+func (m *Profile) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Profile.Merge(m, src)
 }
-func (m *Auth) XXX_Size() int {
+func (m *Profile) XXX_Size() int {
 	return m.Size()
 }
-func (m *Auth) XXX_DiscardUnknown() {
-	xxx_messageInfo_Auth.DiscardUnknown(m)
+func (m *Profile) XXX_DiscardUnknown() {
+	xxx_messageInfo_Profile.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Auth proto.InternalMessageInfo
+var xxx_messageInfo_Profile proto.InternalMessageInfo
+
+func (m *Profile) GetUserId() string {
+	if m != nil {
+		return m.UserId
+	}
+	return ""
+}
+
+func (m *Profile) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *Profile) GetNameChangeAt() int64 {
+	if m != nil {
+		return m.NameChangeAt
+	}
+	return 0
+}
+
+func (m *Profile) GetNameChangeCount() int64 {
+	if m != nil {
+		return m.NameChangeCount
+	}
+	return 0
+}
+
+type Currency struct {
+	UserId       string `protobuf:"bytes,1,opt,name=user_id,proto3" json:"user_id,omitempty"`
+	CurrencyType int64  `protobuf:"varint,2,opt,name=currency_type,proto3" json:"currency_type,omitempty"`
+	Count        int64  `protobuf:"varint,3,opt,name=count,proto3" json:"count,omitempty"`
+}
+
+func (m *Currency) Reset()         { *m = Currency{} }
+func (m *Currency) String() string { return proto.CompactTextString(m) }
+func (*Currency) ProtoMessage()    {}
+func (*Currency) Descriptor() ([]byte, []int) {
+	return fileDescriptor_871986018790d2fd, []int{2}
+}
+func (m *Currency) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Currency) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Currency.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *Currency) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Currency.Merge(m, src)
+}
+func (m *Currency) XXX_Size() int {
+	return m.Size()
+}
+func (m *Currency) XXX_DiscardUnknown() {
+	xxx_messageInfo_Currency.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Currency proto.InternalMessageInfo
+
+func (m *Currency) GetUserId() string {
+	if m != nil {
+		return m.UserId
+	}
+	return ""
+}
+
+func (m *Currency) GetCurrencyType() int64 {
+	if m != nil {
+		return m.CurrencyType
+	}
+	return 0
+}
+
+func (m *Currency) GetCount() int64 {
+	if m != nil {
+		return m.Count
+	}
+	return 0
+}
 
 type DataItem struct {
 	// Types that are valid to be assigned to Item:
 	//
-	//	*DataItem_Auth
+	//	*DataItem_Profile
+	//	*DataItem_Currency
 	Item isDataItem_Item `protobuf_oneof:"item"`
 }
 
@@ -130,7 +257,7 @@ func (m *DataItem) Reset()         { *m = DataItem{} }
 func (m *DataItem) String() string { return proto.CompactTextString(m) }
 func (*DataItem) ProtoMessage()    {}
 func (*DataItem) Descriptor() ([]byte, []int) {
-	return fileDescriptor_871986018790d2fd, []int{2}
+	return fileDescriptor_871986018790d2fd, []int{3}
 }
 func (m *DataItem) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -165,11 +292,15 @@ type isDataItem_Item interface {
 	Size() int
 }
 
-type DataItem_Auth struct {
-	Auth *Auth `protobuf:"bytes,1,opt,name=auth,proto3,oneof" json:"auth,omitempty"`
+type DataItem_Profile struct {
+	Profile *Profile `protobuf:"bytes,1,opt,name=profile,proto3,oneof" json:"profile,omitempty"`
+}
+type DataItem_Currency struct {
+	Currency *Currency `protobuf:"bytes,2,opt,name=currency,proto3,oneof" json:"currency,omitempty"`
 }
 
-func (*DataItem_Auth) isDataItem_Item() {}
+func (*DataItem_Profile) isDataItem_Item()  {}
+func (*DataItem_Currency) isDataItem_Item() {}
 
 func (m *DataItem) GetItem() isDataItem_Item {
 	if m != nil {
@@ -178,9 +309,16 @@ func (m *DataItem) GetItem() isDataItem_Item {
 	return nil
 }
 
-func (m *DataItem) GetAuth() *Auth {
-	if x, ok := m.GetItem().(*DataItem_Auth); ok {
-		return x.Auth
+func (m *DataItem) GetProfile() *Profile {
+	if x, ok := m.GetItem().(*DataItem_Profile); ok {
+		return x.Profile
+	}
+	return nil
+}
+
+func (m *DataItem) GetCurrency() *Currency {
+	if x, ok := m.GetItem().(*DataItem_Currency); ok {
+		return x.Currency
 	}
 	return nil
 }
@@ -188,32 +326,46 @@ func (m *DataItem) GetAuth() *Auth {
 // XXX_OneofWrappers is for the internal use of the proto package.
 func (*DataItem) XXX_OneofWrappers() []interface{} {
 	return []interface{}{
-		(*DataItem_Auth)(nil),
+		(*DataItem_Profile)(nil),
+		(*DataItem_Currency)(nil),
 	}
 }
 
 func init() {
 	proto.RegisterEnum("bf.Data_T", Data_T_name, Data_T_value)
+	proto.RegisterEnum("bf.Currency_T", Currency_T_name, Currency_T_value)
 	proto.RegisterType((*Data)(nil), "bf.Data")
-	proto.RegisterType((*Auth)(nil), "bf.Auth")
+	proto.RegisterType((*Profile)(nil), "bf.Profile")
+	proto.RegisterType((*Currency)(nil), "bf.Currency")
 	proto.RegisterType((*DataItem)(nil), "bf.DataItem")
 }
 
 func init() { proto.RegisterFile("data.proto", fileDescriptor_871986018790d2fd) }
 
 var fileDescriptor_871986018790d2fd = []byte{
-	// 162 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x4a, 0x49, 0x2c, 0x49,
-	0xd4, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x4a, 0x4a, 0x53, 0x92, 0xe7, 0x62, 0x71, 0x49,
-	0x2c, 0x49, 0x54, 0x12, 0xe7, 0x62, 0x0c, 0x11, 0xe2, 0xe0, 0x62, 0xf1, 0xf3, 0xf7, 0x73, 0x15,
-	0x60, 0x00, 0xb1, 0x1c, 0x43, 0x43, 0x3c, 0x04, 0x18, 0x95, 0xd8, 0xb8, 0x58, 0x1c, 0x4b, 0x4b,
-	0x32, 0x94, 0x8c, 0xb8, 0x38, 0x40, 0x0a, 0x3d, 0x4b, 0x52, 0x73, 0x85, 0xe4, 0xb8, 0x58, 0x12,
-	0x4b, 0x4b, 0x32, 0x24, 0x18, 0x15, 0x18, 0x35, 0xb8, 0x8d, 0x38, 0xf4, 0x92, 0xd2, 0xf4, 0x40,
-	0x6a, 0x3c, 0x18, 0x82, 0xc0, 0xe2, 0x4e, 0x6c, 0x5c, 0x2c, 0x99, 0x25, 0xa9, 0xb9, 0x4e, 0x72,
-	0x27, 0x1e, 0xc9, 0x31, 0x5e, 0x78, 0x24, 0xc7, 0xf8, 0xe0, 0x91, 0x1c, 0xe3, 0x84, 0xc7, 0x72,
-	0x0c, 0x17, 0x1e, 0xcb, 0x31, 0xdc, 0x78, 0x2c, 0xc7, 0x10, 0xc5, 0xa2, 0xa7, 0x5f, 0x50, 0x92,
-	0xc4, 0x06, 0x76, 0x87, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0xeb, 0xcc, 0x65, 0x83, 0x95, 0x00,
-	0x00, 0x00,
+	// 346 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x91, 0xc1, 0x4e, 0xea, 0x40,
+	0x18, 0x85, 0x3b, 0x6d, 0x2f, 0xed, 0xfd, 0xcb, 0xbd, 0xe9, 0x9d, 0xdc, 0x45, 0x57, 0x13, 0xd2,
+	0x18, 0x25, 0xc6, 0x14, 0x83, 0x4f, 0x20, 0xa5, 0x08, 0x09, 0x01, 0x32, 0xea, 0x42, 0x37, 0xcd,
+	0x50, 0x06, 0x24, 0x91, 0xb6, 0xa9, 0xc3, 0x82, 0x87, 0x30, 0xd1, 0xb7, 0x72, 0xc9, 0xd2, 0xa5,
+	0x81, 0x17, 0x31, 0x9d, 0x52, 0x23, 0x9a, 0xb8, 0x9a, 0xff, 0x3f, 0xe7, 0x24, 0xf3, 0xcd, 0x19,
+	0x80, 0x09, 0x13, 0xcc, 0x4b, 0xb3, 0x44, 0x24, 0x58, 0x1d, 0x4f, 0xdd, 0x53, 0xd0, 0xdb, 0x4c,
+	0x30, 0xb7, 0x0e, 0xe8, 0x0a, 0x9b, 0xa0, 0x0f, 0x86, 0x83, 0xc0, 0x56, 0xb0, 0x05, 0xc6, 0x88,
+	0x0e, 0x3b, 0xbd, 0x7e, 0x60, 0x23, 0x5c, 0x05, 0xd3, 0xbf, 0xa6, 0x34, 0x18, 0xf8, 0x37, 0xb6,
+	0xea, 0x3e, 0x22, 0x30, 0x46, 0x59, 0x32, 0x9d, 0xdf, 0x73, 0xec, 0x80, 0xb1, 0x7c, 0xe0, 0x59,
+	0x38, 0x9f, 0x38, 0xa8, 0x86, 0xea, 0xbf, 0x69, 0xb9, 0x62, 0x0c, 0x7a, 0xcc, 0x16, 0xdc, 0x51,
+	0xa5, 0x2c, 0x67, 0x7c, 0x08, 0x7f, 0xf3, 0x33, 0x8c, 0xee, 0x58, 0x3c, 0xe3, 0x21, 0x13, 0x8e,
+	0x56, 0x43, 0x75, 0x8d, 0x7e, 0x51, 0xf1, 0x09, 0xfc, 0xfb, 0xac, 0x44, 0xc9, 0x32, 0x16, 0x8e,
+	0x2e, 0xa3, 0xdf, 0x0d, 0xf7, 0x19, 0x81, 0xe9, 0x2f, 0xb3, 0x8c, 0xc7, 0xd1, 0xea, 0x07, 0xa0,
+	0x03, 0xf8, 0x13, 0xed, 0x52, 0xa1, 0x58, 0xa5, 0x05, 0x99, 0x46, 0xf7, 0x45, 0xfc, 0x1f, 0x7e,
+	0x15, 0xd7, 0x15, 0x64, 0xc5, 0xe2, 0x36, 0xf6, 0xcb, 0x31, 0x41, 0xbf, 0x18, 0xf6, 0xdb, 0x45,
+	0x33, 0x1d, 0x1a, 0x04, 0xfe, 0xf9, 0x65, 0xd7, 0x56, 0x73, 0x5d, 0x4e, 0x9a, 0x3b, 0x03, 0x33,
+	0x6f, 0xb5, 0x27, 0xf8, 0x02, 0x1f, 0x81, 0x91, 0x16, 0x75, 0x49, 0x24, 0xab, 0x69, 0x79, 0xe3,
+	0xa9, 0xb7, 0x6b, 0xb0, 0xab, 0xd0, 0xd2, 0xc5, 0xc7, 0x60, 0x96, 0x30, 0x12, 0xce, 0x6a, 0x56,
+	0xf3, 0x64, 0xf9, 0xb6, 0xae, 0x42, 0x3f, 0xfc, 0x56, 0x05, 0xf4, 0xb9, 0xe0, 0x8b, 0x16, 0x79,
+	0xd9, 0x10, 0xb4, 0xde, 0x10, 0xf4, 0xb6, 0x21, 0xe8, 0x69, 0x4b, 0x94, 0xf5, 0x96, 0x28, 0xaf,
+	0x5b, 0xa2, 0xdc, 0xea, 0x5e, 0x23, 0x15, 0xe3, 0x8a, 0xfc, 0xe9, 0xb3, 0xf7, 0x00, 0x00, 0x00,
+	0xff, 0xff, 0x33, 0xac, 0xfa, 0x64, 0xf7, 0x01, 0x00, 0x00,
 }
 
 func (m *Data) Marshal() (dAtA []byte, err error) {
@@ -239,7 +391,7 @@ func (m *Data) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *Auth) Marshal() (dAtA []byte, err error) {
+func (m *Profile) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -249,16 +401,80 @@ func (m *Auth) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *Auth) MarshalTo(dAtA []byte) (int, error) {
+func (m *Profile) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *Auth) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *Profile) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
+	if m.NameChangeCount != 0 {
+		i = encodeVarintData(dAtA, i, uint64(m.NameChangeCount))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.NameChangeAt != 0 {
+		i = encodeVarintData(dAtA, i, uint64(m.NameChangeAt))
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintData(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.UserId) > 0 {
+		i -= len(m.UserId)
+		copy(dAtA[i:], m.UserId)
+		i = encodeVarintData(dAtA, i, uint64(len(m.UserId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *Currency) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Currency) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Currency) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Count != 0 {
+		i = encodeVarintData(dAtA, i, uint64(m.Count))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.CurrencyType != 0 {
+		i = encodeVarintData(dAtA, i, uint64(m.CurrencyType))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.UserId) > 0 {
+		i -= len(m.UserId)
+		copy(dAtA[i:], m.UserId)
+		i = encodeVarintData(dAtA, i, uint64(len(m.UserId)))
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -294,16 +510,16 @@ func (m *DataItem) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *DataItem_Auth) MarshalTo(dAtA []byte) (int, error) {
+func (m *DataItem_Profile) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *DataItem_Auth) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *DataItem_Profile) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.Auth != nil {
+	if m.Profile != nil {
 		{
-			size, err := m.Auth.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.Profile.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -312,6 +528,27 @@ func (m *DataItem_Auth) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		}
 		i--
 		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+func (m *DataItem_Currency) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DataItem_Currency) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.Currency != nil {
+		{
+			size, err := m.Currency.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintData(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
 	}
 	return len(dAtA) - i, nil
 }
@@ -335,12 +572,45 @@ func (m *Data) Size() (n int) {
 	return n
 }
 
-func (m *Auth) Size() (n int) {
+func (m *Profile) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
+	l = len(m.UserId)
+	if l > 0 {
+		n += 1 + l + sovData(uint64(l))
+	}
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovData(uint64(l))
+	}
+	if m.NameChangeAt != 0 {
+		n += 1 + sovData(uint64(m.NameChangeAt))
+	}
+	if m.NameChangeCount != 0 {
+		n += 1 + sovData(uint64(m.NameChangeCount))
+	}
+	return n
+}
+
+func (m *Currency) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.UserId)
+	if l > 0 {
+		n += 1 + l + sovData(uint64(l))
+	}
+	if m.CurrencyType != 0 {
+		n += 1 + sovData(uint64(m.CurrencyType))
+	}
+	if m.Count != 0 {
+		n += 1 + sovData(uint64(m.Count))
+	}
 	return n
 }
 
@@ -356,14 +626,26 @@ func (m *DataItem) Size() (n int) {
 	return n
 }
 
-func (m *DataItem_Auth) Size() (n int) {
+func (m *DataItem_Profile) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.Auth != nil {
-		l = m.Auth.Size()
+	if m.Profile != nil {
+		l = m.Profile.Size()
+		n += 1 + l + sovData(uint64(l))
+	}
+	return n
+}
+func (m *DataItem_Currency) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Currency != nil {
+		l = m.Currency.Size()
 		n += 1 + l + sovData(uint64(l))
 	}
 	return n
@@ -425,7 +707,7 @@ func (m *Data) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *Auth) Unmarshal(dAtA []byte) error {
+func (m *Profile) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -448,12 +730,234 @@ func (m *Auth) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: Auth: wiretype end group for non-group")
+			return fmt.Errorf("proto: Profile: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Auth: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: Profile: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowData
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthData
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthData
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.UserId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowData
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthData
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthData
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NameChangeAt", wireType)
+			}
+			m.NameChangeAt = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowData
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.NameChangeAt |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NameChangeCount", wireType)
+			}
+			m.NameChangeCount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowData
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.NameChangeCount |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipData(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthData
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Currency) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowData
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Currency: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Currency: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowData
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthData
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthData
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.UserId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CurrencyType", wireType)
+			}
+			m.CurrencyType = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowData
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.CurrencyType |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Count", wireType)
+			}
+			m.Count = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowData
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Count |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipData(dAtA[iNdEx:])
@@ -506,7 +1010,7 @@ func (m *DataItem) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Auth", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Profile", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -533,11 +1037,46 @@ func (m *DataItem) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &Auth{}
+			v := &Profile{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Item = &DataItem_Auth{v}
+			m.Item = &DataItem_Profile{v}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Currency", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowData
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthData
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthData
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &Currency{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Item = &DataItem_Currency{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

@@ -7,17 +7,36 @@ package bf;
 message Data {
     enum T {
         NONE = 0;
-        AUTH = 1;
+        PROFILE = 1;
+        CURRENCY = 2;
     }    
 }
 
-message Auth {
-
+message Profile {
+    string user_id = 1                              [json_name = "user_id"];
+    string name = 2                                 [json_name = "name"];
+    int64  name_change_at = 3                       [json_name = "name_change_at"];
+    int64  name_change_count = 4                    [json_name = "name_change_count"];    
 }
+
+message Currency {
+    enum T {
+        NONE = 0;
+        GOLD = 1;
+        FREECASH = 2;
+        CASH = 3;
+    }
+
+    string user_id = 1                              [json_name = "user_id"];
+    int64  currency_type = 2                        [json_name = "currency_type"];
+    int64  count = 3                                [json_name = "count"];
+}
+
 
 message DataItem {
     oneof item {
-        Auth auth = 1;
+        Profile profile = 1;
+        Currency currency = 2;         
     }
 }
 

@@ -23,5 +23,5 @@ func TestRepo(t *testing.T) {
 	r := ManagerRepository{}
 
 	tx, _ := bsql.RDB.GetAdminDB().Begin()
-	r.Get(tx, "master_id")
+	r.GetTx(tx, "master_id")
 }

@@ -32,7 +32,30 @@ func (r *ManagerRepository) GetCache(key model.EModel, id string, pipe *redis.Pi
 	return nil, nil
 }
 
-func (r *ManagerRepository) Get(tx *sql.Tx, id string) (interface{}, error) {
+func (r *ManagerRepository) Get(db *sql.DB, id string) (interface{}, error) {
+	queries := []string{
+		`SELECT id, grade, password FROM`,
+		bsql.AdminTable,
+		`WHERE id = ?`,
+	}
+	resultQuery := strings.Join(queries, " ")
+
+	rows := db.QueryRow(resultQuery, id)
+
+	var m model.Manager
+
+	if err := rows.Scan(&m.ID, &m.Grade, &m.Password); err != nil {
+		return nil, err
+	}
+
+	if m.ID == "" {
+		return nil, errors.New("not found")
+	}
+
+	return &m, nil
+}
+
+func (r *ManagerRepository) GetTx(tx *sql.Tx, id string) (interface{}, error) {
 	queries := []string{
 		`SELECT id, grade, password FROM`,
 		bsql.AdminTable,
@@ -58,7 +81,7 @@ func (r *ManagerRepository) Get(tx *sql.Tx, id string) (interface{}, error) {
 func (r *ManagerRepository) Put(tx *sql.Tx, data model.IModel) error {
 	queries := []string{
 		`INSERT INTO`,
-		data.GetTable(),
+		data.GetKey(),
 		`(id, grade, name, password) VALUES (?, ?, ?, ?)`,
 	}
 	resultQuery := strings.Join(queries, " ")

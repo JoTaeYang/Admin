@@ -27,12 +27,21 @@ message LoginResponse {
 }
 
 
-message LoadRequest {
+message NewUserRequest {
+    string id = 1                                   [json_name = "id"];
+    string name = 2                                 [json_name = "name"];
+}
 
+message NewUserResponse {
+    
+}
+
+message LoadRequest {
+    string uid = 1                                  [json_name = "uid"];
 }
 
 message LoadResponse {
-    map<int32, DataItem> Datas = 1;
+    repeated DataItem Datas = 1;
 }
 
 message AuthLoginRequest {

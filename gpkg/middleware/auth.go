@@ -15,6 +15,7 @@ func AuthMiddleware(cfg *config.Configs) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		skipPaths := map[string]bool{
 			"login": true,
+			"new":   true,
 		}
 
 		path := c.FullPath()

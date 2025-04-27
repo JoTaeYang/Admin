@@ -2,46 +2,78 @@ package model
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/redis/go-redis/v9"
 )
 
+type SelectionType int
+
+const (
+	SelectionTypeSingle SelectionType = iota
+	SelectionTypeMulti
+)
+
+type SelectionEntry struct {
+	Type       SelectionType
+	Repository interface{}
+}
+
 type Selector struct {
-	Id     string
-	single map[EModel]ISingleRepository
-	raw    map[EModel]IRawRepository
+	Id         string
+	selections map[EModel]SelectionEntry
 }
 
 type ISingleRepository interface {
-	Get(tx *sql.Tx, id string) (interface{}, error)
+	GetTx(tx *sql.Tx, id string) (interface{}, error)
+	Get(db *sql.DB, id string) (interface{}, error)
 	GetCache(key EModel, id string, pipe *redis.Pipeliner) (interface{}, error)
 }
 
-type IRawRepository interface {
-	Get(tx *sql.Tx) (interface{}, error)
-	GetCache(key EModel, id string, pipe *redis.Pipeliner) (interface{}, error)
+type IMultiRepository interface {
+	GetTx(tx *sql.Tx) (interface{}, error)
+	Get(db *sql.DB) (interface{}, error)
+	GetCache(key EModel, id string, pipe *redis.Pipeliner) (interface{}, error) // THINK : id를 slice로 받아야 할까? 그런 경우가 있을까.. 데이터가 없으니 너무 턱 막히네
+}
+
+type IUpdaterRepository interface {
+	Update(tx *sql.Tx, data IModel) error
 }
 
 func NewSelector(id string) *Selector {
 	return &Selector{
-		Id:     id,
-		single: make(map[EModel]ISingleRepository, 5),
-		raw:    make(map[EModel]IRawRepository, 5),
+		Id:         id,
+		selections: make(map[EModel]SelectionEntry, 5),
 	}
 }
 
 func (s *Selector) AddSingle(key EModel, data ISingleRepository) {
-	s.single[key] = data
+	if _, ok := s.selections[key]; ok {
+		return
+	}
+
+	s.selections[key] = SelectionEntry{
+		Type:       SelectionTypeSingle,
+		Repository: data,
+	}
 }
 
-func (s *Selector) AddRaw(key EModel, data IRawRepository) {
-	s.raw[key] = data
+func (s *Selector) AddMulti(key EModel, data IMultiRepository) {
+	s.selections[key] = SelectionEntry{
+		Type:       SelectionTypeMulti,
+		Repository: data,
+	}
 }
 
-func (s *Selector) GetSingle() map[EModel]ISingleRepository {
-	return s.single
+func (s *Selector) GetSelect() map[EModel]SelectionEntry {
+	return s.selections
 }
 
-func (s *Selector) GetRaw() map[EModel]IRawRepository {
-	return s.raw
+func (s *Selector) GetRepository(key EModel) (*SelectionEntry, error) {
+	var data SelectionEntry
+	var ok bool
+	if data, ok = s.selections[key]; !ok {
+		return nil, errors.New("not found")
+	}
+	return &data, nil
 }

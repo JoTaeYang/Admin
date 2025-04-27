@@ -10,10 +10,10 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type AuthRepository struct {
+type ProfileRepository struct {
 }
 
-func (r *AuthRepository) GetCache(key model.EModel, id string, pipe *redis.Pipeliner) (interface{}, error) {
+func (r *ProfileRepository) GetCache(key model.EModel, id string, pipe *redis.Pipeliner) (interface{}, error) {
 	id = `{` + id + `}`
 	dataKey := model.EModelMapStr[key]
 	list := []string{
@@ -30,46 +30,52 @@ func (r *AuthRepository) GetCache(key model.EModel, id string, pipe *redis.Pipel
 	return nil, nil
 }
 
-func (r *AuthRepository) Get(db *sql.DB, id string) (interface{}, error) {
-	var m model.Auth
+func (r *ProfileRepository) Get(db *sql.DB, id string) (interface{}, error) {
+	var m model.Profile
 	queries := []string{
-		`SELECT id, user_id FROM`,
+		`SELECT user_id, name, name_change_at FROM`,
 		m.GetKey(),
 		`WHERE user_id = ?`,
 	}
+
 	resultQuery := strings.Join(queries, " ")
 
 	rows := db.QueryRow(resultQuery, id)
-	if err := rows.Scan(&m.ID, &m.UserId); err != nil {
+
+	if err := rows.Scan(&m.UserId, &m.Name, &m.NameChangeAt); err != nil {
 		return nil, err
 	}
 
 	return &m, nil
 }
 
-func (r *AuthRepository) GetTx(tx *sql.Tx, id string) (interface{}, error) {
-	var m model.Identity
+func (r *ProfileRepository) GetTx(tx *sql.Tx, id string) (interface{}, error) {
+	var m model.Profile
 	queries := []string{
-		`SELECT id, user_id, shard_idx FROM`,
+		`SELECT user_id, name, name_change_at FROM`,
 		m.GetKey(),
 		`WHERE user_id = ?`,
 	}
+
 	resultQuery := strings.Join(queries, " ")
 
 	rows := tx.QueryRow(resultQuery, id)
 
-	if err := rows.Scan(&m.ID, &m.UserId, &m.ShardIdx); err != nil {
+	if err := rows.Scan(&m.UserId, &m.Name, &m.NameChangeAt); err != nil {
 		return nil, err
 	}
-
 	return &m, nil
 }
 
-func (r *AuthRepository) Update(tx *sql.Tx, data model.IModel) error {
+func (r *ProfileRepository) Update(tx *sql.Tx, data model.IModel) error {
 	queries := []string{
 		`INSERT INTO`,
 		data.GetKey(),
-		`(user_id, grade, shard_idx) VALUES (?, ?, ?)`,
+		`(user_id, name) VALUES (?, ?)`,
+		`ON DUPLICATE KEY UPDATE`,
+		`name = VALUES(name),`,
+		`name_change_at = IF(name != VALUES(name), CURRENT_TIMESTAMP, name_change_at),`,
+		`name_change_count = IF(name != VALUES(name), name_change_count + 1, name_change_count)`,
 	}
 	resultQuery := strings.Join(queries, " ")
 

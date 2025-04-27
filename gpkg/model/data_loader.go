@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/JoTaeYang/Admin/gpkg/bredis"
+	"github.com/JoTaeYang/Admin/gpkg/bsql"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -14,6 +15,30 @@ type Loader struct {
 
 func NewLoader() *Loader {
 	return &Loader{}
+}
+
+func (l *Loader) Load(selector *Selector, shardIdx int64) (map[EModel]interface{}, error) {
+
+	result := make(map[EModel]interface{}, 5)
+
+	selections := selector.GetSelect()
+
+	for key, entry := range selections {
+		dbKey := EModelDBGroup[key]
+
+		db := bsql.RDB.GetDB(string(dbKey), int32(shardIdx))
+		switch entry.Type {
+		case SelectionTypeSingle:
+			repo := entry.Repository.(ISingleRepository)
+			result[key], _ = repo.Get(db, selector.Id)
+
+		case SelectionTypeMulti:
+			repo := entry.Repository.(IMultiRepository)
+			result[key], _ = repo.Get(db)
+		}
+	}
+
+	return result, nil
 }
 
 func (l *Loader) LoadTx(db *sql.DB, selector *Selector) (map[EModel]interface{}, error) {
@@ -30,20 +55,22 @@ func (l *Loader) LoadTx(db *sql.DB, selector *Selector) (map[EModel]interface{},
 		}
 	}()
 
-	singleList := selector.GetSingle()
-	rowList := selector.GetRaw()
+	selections := selector.GetSelect()
 
-	for k, v := range singleList {
-		result[k], err = v.Get(tx, selector.Id)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	for k, v := range rowList {
-		result[k], err = v.Get(tx)
-		if err != nil {
-			return nil, err
+	for key, entry := range selections {
+		switch entry.Type {
+		case SelectionTypeSingle:
+			repo := entry.Repository.(ISingleRepository)
+			result[key], err = repo.GetTx(tx, selector.Id)
+			if err != nil {
+				return nil, err
+			}
+		case SelectionTypeMulti:
+			repo := entry.Repository.(IMultiRepository)
+			result[key], err = repo.GetTx(tx)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -57,20 +84,22 @@ func (l *Loader) LoadCache(selector *Selector) (map[EModel]interface{}, error) {
 
 	pipe := bredis.R.ReadRedisCli.Pipeline()
 
-	singleList := selector.GetSingle()
-	rowList := selector.GetRaw()
+	selections := selector.GetSelect()
 
-	for k, v := range singleList {
-		result[k], err = v.GetCache(k, selector.Id, &pipe)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	for k, v := range rowList {
-		result[k], err = v.GetCache(k, selector.Id, &pipe)
-		if err != nil {
-			return nil, err
+	for key, entry := range selections {
+		switch entry.Type {
+		case SelectionTypeSingle:
+			repo := entry.Repository.(ISingleRepository)
+			result[key], err = repo.GetCache(key, selector.Id, &pipe)
+			if err != nil {
+				return nil, err
+			}
+		case SelectionTypeMulti:
+			repo := entry.Repository.(IMultiRepository)
+			result[key], err = repo.GetCache(key, selector.Id, &pipe)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 

@@ -7,7 +7,8 @@ import (
 )
 
 type IModel interface {
-	GetTable() string
+	GetKey() string // DB 테이블 명과 Redis Key에서 씀
+	GetEModel() EModel
 	GetCreate() []interface{}
 }
 

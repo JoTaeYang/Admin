@@ -39,6 +39,7 @@ func InitRouter() *gin.Engine {
 	{
 		h := handler.NewAuthHandler(svc)
 		AuthRouter.POST("/sign", h.SignUp)
+		AuthRouter.POST("/login", h.Login)
 	}
 
 	return r

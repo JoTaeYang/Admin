@@ -3,7 +3,9 @@ package bsql
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"math/rand/v2"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -34,6 +36,19 @@ type RDBWrap struct {
 	dbs map[string][]*sql.DB
 }
 
+type DBGroup string
+
+const (
+	DBGroupIdentity DBGroup = "IDENTITY"
+	DBGroupGame     DBGroup = "GAME"
+	DBGroupAdmin    DBGroup = "ADMIN"
+)
+
+const (
+	DBAuth     string = "AUTH"
+	DBIdentity string = "IDENTITY"
+)
+
 var (
 	cfg           map[string]Config
 	RDB           RDBWrap
@@ -55,6 +70,10 @@ func InitService(config []Config) error {
 				return err
 			}
 
+			db.SetMaxOpenConns(50)               // 최대 동시에 열 수 있는 연결 수
+			db.SetMaxIdleConns(10)               // idle 상태로 유지할 연결 수
+			db.SetConnMaxLifetime(1 * time.Hour) // 연결의 최대 수명
+
 			fmt.Println("mysql db service : ", v.Port[j])
 
 			if RDB.dbs[v.Mode] == nil {
@@ -65,6 +84,10 @@ func InitService(config []Config) error {
 	}
 
 	return nil
+}
+
+func (r *RDBWrap) GetDB(key string, shard int32) *sql.DB {
+	return r.getDB(key, shard)
 }
 
 func (r *RDBWrap) GetAdminDB() *sql.DB {
@@ -88,11 +111,20 @@ func (r *RDBWrap) GetGameShardIndex() int32 {
 }
 
 func (r *RDBWrap) getDB(mode string, shard int32) *sql.DB {
-	sIdx := int(shard - 1)
+	if mode == string(DBGroupIdentity) {
+		return r.dbs[mode][0]
+	}
 
+	sIdx := int(shard - 1)
 	if len(r.dbs[mode]) < sIdx {
 		return nil
 	}
 
 	return r.dbs[mode][sIdx]
+}
+
+func GenerateShardIdx(id int64) int64 {
+	key := "GAME"
+	log.Println(id, id/10)
+	return (id / 10) % int64(cfg[key].ShardCount)
 }

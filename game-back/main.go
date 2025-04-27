@@ -34,18 +34,14 @@ func InitRouter() *gin.Engine {
 	r.Use(mw.AuthMiddleware(&cfg))
 
 	loader := model.NewLoader()
-	svc := service.NewLoadService(loader, &cfg)
+	svc := service.NewUserService(loader, &cfg)
 	url := "/big/game"
 
-	LoadRouter := r.Group(url + "/load")
+	UserRouter := r.Group(url + "/user")
 	{
-		h := handler.NewLoadHandler(svc)
-		LoadRouter.POST("/data", h.Load)
-	}
-
-	ManagementRouter := r.Group(url + "/management")
-	{
-		_ = ManagementRouter
+		h := handler.NewUserHandler(svc)
+		UserRouter.POST("/load", h.Load)
+		UserRouter.POST("/new", h.New)
 	}
 
 	return r

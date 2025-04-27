@@ -10,8 +10,12 @@ type Manager struct {
 	Ttl      interface{} `json:"ttl"`
 }
 
-func (m *Manager) GetTable() string {
+func (m *Manager) GetKey() string {
 	return "manager"
+}
+
+func (m *Manager) GetEModel() EModel {
+	return EManager
 }
 
 func (m *Manager) GetCreate() []interface{} {
