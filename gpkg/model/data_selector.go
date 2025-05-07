@@ -14,9 +14,14 @@ const (
 	SelectionTypeMulti
 )
 
+type QueryOption struct {
+	Params []string
+}
+
 type SelectionEntry struct {
 	Type       SelectionType
 	Repository interface{}
+	Option     *QueryOption
 }
 
 type Selector struct {
@@ -28,6 +33,10 @@ type ISingleRepository interface {
 	GetTx(tx *sql.Tx, id string) (interface{}, error)
 	Get(db *sql.DB, id string) (interface{}, error)
 	GetCache(key EModel, id string, pipe *redis.Pipeliner) (interface{}, error)
+}
+
+type IOptionRepository interface {
+	GetWithOption(tx *sql.Tx, id string, option *QueryOption) (interface{}, error)
 }
 
 type IMultiRepository interface {
@@ -44,6 +53,18 @@ func NewSelector(id string) *Selector {
 	return &Selector{
 		Id:         id,
 		selections: make(map[EModel]SelectionEntry, 5),
+	}
+}
+
+func (s *Selector) AddSingleWithOption(key EModel, data ISingleRepository, option *QueryOption) {
+	if _, ok := s.selections[key]; ok {
+		return
+	}
+
+	s.selections[key] = SelectionEntry{
+		Type:       SelectionTypeSingle,
+		Repository: data,
+		Option:     option,
 	}
 }
 

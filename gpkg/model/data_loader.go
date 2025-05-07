@@ -31,7 +31,6 @@ func (l *Loader) Load(selector *Selector, shardIdx int64) (map[EModel]interface{
 		case SelectionTypeSingle:
 			repo := entry.Repository.(ISingleRepository)
 			result[key], _ = repo.Get(db, selector.Id)
-
 		case SelectionTypeMulti:
 			repo := entry.Repository.(IMultiRepository)
 			result[key], _ = repo.Get(db)
@@ -60,10 +59,18 @@ func (l *Loader) LoadTx(db *sql.DB, selector *Selector) (map[EModel]interface{},
 	for key, entry := range selections {
 		switch entry.Type {
 		case SelectionTypeSingle:
-			repo := entry.Repository.(ISingleRepository)
-			result[key], err = repo.GetTx(tx, selector.Id)
-			if err != nil {
-				return nil, err
+			if entry.Option == nil {
+				repo := entry.Repository.(ISingleRepository)
+				result[key], err = repo.GetTx(tx, selector.Id)
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				repo := entry.Repository.(IOptionRepository)
+				result[key], _ = repo.GetWithOption(tx, selector.Id, entry.Option)
+				if err != nil {
+					return nil, err
+				}
 			}
 		case SelectionTypeMulti:
 			repo := entry.Repository.(IMultiRepository)

@@ -2,6 +2,7 @@ package repo
 
 import (
 	"database/sql"
+	"log"
 	"strings"
 
 	"github.com/JoTaeYang/Admin/gpkg/bredis"
@@ -11,6 +12,26 @@ import (
 )
 
 type CurrencyRepository struct {
+}
+
+func (r *CurrencyRepository) getSQLQuery(table string, option *model.QueryOption) []string {
+	queries := []string{
+		`SELECT user_id, currency_type, count FROM`,
+		table,
+		`WHERE user_id = ?`,
+	}
+
+	if option != nil && len(option.Params) > 0 {
+		// 물음표를 param 개수만큼 생성하고 쉼표로 구분
+		placeholders := strings.Repeat("?,", len(option.Params))
+
+		// 마지막 쉼표 제거
+		placeholders = placeholders[:len(placeholders)-1]
+
+		queries = append(queries, `AND currency_type IN (`+placeholders+`)`)
+	}
+
+	return queries
 }
 
 func (r *CurrencyRepository) GetCache(key model.EModel, id string, pipe *redis.Pipeliner) (interface{}, error) {
@@ -32,11 +53,8 @@ func (r *CurrencyRepository) GetCache(key model.EModel, id string, pipe *redis.P
 
 func (r *CurrencyRepository) Get(db *sql.DB, id string) (interface{}, error) {
 	var m model.Currency
-	queries := []string{
-		`SELECT user_id, currency_type, count FROM`,
-		m.GetKey(),
-		`WHERE user_id = ?`,
-	}
+
+	queries := r.getSQLQuery(m.GetKey(), nil)
 
 	resultQuery := strings.Join(queries, " ")
 
@@ -60,11 +78,8 @@ func (r *CurrencyRepository) Get(db *sql.DB, id string) (interface{}, error) {
 
 func (r *CurrencyRepository) GetTx(tx *sql.Tx, id string) (interface{}, error) {
 	var m model.Currency
-	queries := []string{
-		`SELECT user_id, currency_type, count FROM`,
-		m.GetKey(),
-		`WHERE user_id = ?`,
-	}
+
+	queries := r.getSQLQuery(m.GetKey(), nil)
 
 	resultQuery := strings.Join(queries, " ")
 
@@ -74,6 +89,40 @@ func (r *CurrencyRepository) GetTx(tx *sql.Tx, id string) (interface{}, error) {
 	}
 	defer rows.Close()
 
+	mList := make([]*model.Currency, 0, 5)
+	for rows.Next() {
+		m := &model.Currency{}
+		if err := rows.Scan(&m.UserId, &m.CurrencyType, &m.Count); err != nil {
+			return nil, err
+		}
+		mList = append(mList, m)
+	}
+
+	return mList, nil
+}
+
+func (r *CurrencyRepository) GetWithOption(tx *sql.Tx, id string, option *model.QueryOption) (interface{}, error) {
+	var m model.Currency
+
+	queries := r.getSQLQuery(m.GetKey(), option)
+
+	resultQuery := strings.Join(queries, " ")
+
+	args := []interface{}{id}
+
+	if option != nil && len(option.Params) > 0 {
+		for _, v := range option.Params {
+			args = append(args, v)
+		}
+	}
+
+	rows, err := tx.Query(resultQuery, args...)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	defer rows.Close()
 	mList := make([]*model.Currency, 0, 5)
 	for rows.Next() {
 		m := &model.Currency{}
