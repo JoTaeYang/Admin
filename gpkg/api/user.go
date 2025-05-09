@@ -49,13 +49,19 @@ func MakeAccount(id, name, grade string, shardIdx int64, selector *model.Selecto
 		Count:        0,
 	}
 
+	petGacha := &model.Currency{
+		UserId:       id,
+		CurrencyType: int64(pt.Currency_PET_GACHA_TICKET),
+		Count:        0,
+	}
+
 	profile := &model.Profile{
 		UserId: id,
 		Name:   name,
 	}
 
 	updater.AddUpsert(auth)
-	updater.AddUpsertMulti([]model.IModel{gold, freeCash, cash})
+	updater.AddUpsertMulti([]model.IModel{gold, freeCash, cash, petGacha})
 	updater.AddUpsert(profile)
 
 	err := updater.Execute(bsql.RDB.GetGameDB(int32(shardIdx)), selector)

@@ -24,7 +24,8 @@ message Currency {
         NONE = 0;
         GOLD = 1;
         FREECASH = 2;
-        CASH = 3;
+        CASH = 3;        
+        PET_GACHA_TICKET = 4;
     }
 
     string user_id = 1                              [json_name = "user_id"];

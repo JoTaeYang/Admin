@@ -59,3 +59,13 @@ message AuthSignRequest {
 message AuthSignResponse {
     
 }
+
+message ShopGachaRequest {
+    string key = 1                                  [json_name = "key"];
+    int32 count = 2                                 [json_name = "count"];
+    bool use_ticket = 3                             [json_name = "use_ticket"];
+}
+
+message ShopGachaResponse {
+    repeated DataItem Datas = 1                     [json_name = "datas"];
+}

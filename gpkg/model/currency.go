@@ -39,3 +39,23 @@ func (m *Currency) ConvertGRPC() *pt.DataItem {
 		},
 	}
 }
+
+func (c *DataContext) GetCurrency(t pt.Currency_T) (*Currency, bool) {
+	val, ok := c.data[ECurrency]
+	if !ok {
+		return nil, false
+	}
+
+	casted, ok := val.([]*Currency)
+	if !ok {
+		return nil, false
+	}
+
+	for _, v := range casted {
+		if v.CurrencyType == int64(t) {
+			return v, true
+		}
+	}
+
+	return nil, false
+}
