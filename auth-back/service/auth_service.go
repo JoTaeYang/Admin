@@ -29,20 +29,12 @@ func NewAuthService(loader *model.Loader, config *config.Configs) AuthService {
 }
 
 func (s *authService) SignUp(c *gin.Context, id string) error {
-	hub := model.MakeModelHubAuth(c, &repo.IdentityRepository{})
+	hub := model.MakeModelHubAuth(c, id, &repo.IdentityRepository{})
 	if hub == nil {
 		return errors.New("Make Hub Error")
 	}
 
-	model.AddSingle(hub, model.EIdentity, &repo.IdentityRepository{})
-
-	err := s.loader.LoadTx(hub)
-	if err != nil {
-		return err
-	}
-
-	_, ok := hub.GetIdentity()
-	if ok {
+	if hub.GetIdentity() != nil {
 		return errors.New("overlapped uuid")
 	}
 
@@ -57,7 +49,7 @@ func (s *authService) SignUp(c *gin.Context, id string) error {
 		ShardIdx: bsql.GenerateShardIdx(genID),
 	})
 
-	err = updater.Execute(hub)
+	err := updater.Execute(hub)
 	if err != nil {
 		return err
 	}
@@ -65,20 +57,12 @@ func (s *authService) SignUp(c *gin.Context, id string) error {
 }
 
 func (s *authService) Login(c *gin.Context, id string) (string, error) {
-	hub := model.MakeModelHubAuth(c, &repo.IdentityRepository{})
+	hub := model.MakeModelHub(c, &repo.IdentityRepository{})
 	if hub == nil {
 		return "", errors.New("Make Hub Error")
 	}
 
-	model.AddSingle(hub, model.EIdentity, &repo.IdentityRepository{})
-
-	err := s.loader.LoadTx(hub)
-	if err != nil {
-		return "", err
-	}
-
-	_, ok := hub.GetIdentity()
-	if !ok {
+	if hub.GetIdentity() == nil {
 		return "", errors.New("not found id")
 	}
 

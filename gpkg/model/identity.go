@@ -22,8 +22,8 @@ func (m *Identity) GetCreate() []interface{} {
 	}
 }
 
-func (m *ModelHub) GetIdentity() (*Identity, bool) {
-	return GetFromContext[*Identity](m.DataCtx, EIdentity)
+func (m *ModelHub) GetIdentity() *Identity {
+	return m.Identity
 }
 
 /*

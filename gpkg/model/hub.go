@@ -9,7 +9,6 @@ import (
 )
 
 type ModelHub struct {
-	Id       string
 	Identity *Identity
 
 	ctx    context.Context
@@ -64,19 +63,11 @@ func MakeModelHub(c *gin.Context, identityRepo ISingleRepository) *ModelHub {
 	}
 }
 
-func MakeModelHubAuth(c *gin.Context, identityRepo ISingleRepository) *ModelHub {
-	userID, ok := c.Get("userID")
-	if !ok {
-		return nil
-	}
-
-	uid := userID.(string)
-
+func MakeModelHubAuth(c *gin.Context, id string, identityRepo ISingleRepository) *ModelHub {
 	ctx, cancel := context.WithCancel(c)
 
-	identity := makeIdentity(ctx, identityRepo, uid)
-
 	//identity save 추가하기
+	identity := makeIdentity(ctx, identityRepo, id)
 
 	return &ModelHub{
 		Identity: identity,
@@ -85,7 +76,7 @@ func MakeModelHubAuth(c *gin.Context, identityRepo ISingleRepository) *ModelHub 
 		cancel: cancel,
 
 		db:       bsql.RDB.GetIdentityDB(),
-		selector: NewSelector(uid),
+		selector: NewSelector(id),
 	}
 }
 
