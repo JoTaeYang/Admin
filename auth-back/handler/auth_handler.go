@@ -35,7 +35,7 @@ func (h *AuthHandler) SignUp(c *gin.Context) {
 		return
 	}
 
-	err = h.service.SignUp(req.Uid)
+	err = h.service.SignUp(c, req.Uid)
 	if err != nil {
 		c.JSON(http.StatusOK, errResponse)
 		return
@@ -62,7 +62,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := h.service.Login(req.Uid)
+	token, err := h.service.Login(c, req.Uid)
 	if err != nil {
 		c.JSON(http.StatusOK, errResponse)
 		return

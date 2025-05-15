@@ -3,10 +3,13 @@ package handler
 import (
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/JoTaeYang/Admin/admin-back/service"
+	"github.com/JoTaeYang/Admin/gpkg/converter"
 	"github.com/JoTaeYang/Admin/gpkg/pt"
 	"github.com/gin-gonic/gin"
+	"github.com/golang/protobuf/jsonpb"
 )
 
 type LoginHandler struct {
@@ -26,9 +29,9 @@ func (h *LoginHandler) Login(c *gin.Context) {
 		return
 	}
 
-	err = req.Unmarshal(data)
+	err = jsonpb.Unmarshal(strings.NewReader(converter.ZeroCopyByteToString(data)), req)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, errResponse)
+		c.JSON(http.StatusOK, errResponse)
 		return
 	}
 

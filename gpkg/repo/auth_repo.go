@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"context"
 	"database/sql"
 	"strings"
 
@@ -30,7 +31,7 @@ func (r *AuthRepository) GetCache(key model.EModel, id string, pipe *redis.Pipel
 	return nil, nil
 }
 
-func (r *AuthRepository) Get(db *sql.DB, id string) (interface{}, error) {
+func (r *AuthRepository) Get(ctx context.Context, db *sql.DB, id string) (interface{}, error) {
 	var m model.Auth
 	queries := []string{
 		`SELECT id, user_id FROM`,

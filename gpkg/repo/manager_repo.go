@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"strings"
@@ -32,7 +33,7 @@ func (r *ManagerRepository) GetCache(key model.EModel, id string, pipe *redis.Pi
 	return nil, nil
 }
 
-func (r *ManagerRepository) Get(db *sql.DB, id string) (interface{}, error) {
+func (r *ManagerRepository) Get(ctx context.Context, db *sql.DB, id string) (interface{}, error) {
 	queries := []string{
 		`SELECT id, grade, password FROM`,
 		bsql.AdminTable,

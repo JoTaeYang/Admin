@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"context"
 	"database/sql"
 	"strings"
 
@@ -30,7 +31,7 @@ func (r *ProfileRepository) GetCache(key model.EModel, id string, pipe *redis.Pi
 	return nil, nil
 }
 
-func (r *ProfileRepository) Get(db *sql.DB, id string) (interface{}, error) {
+func (r *ProfileRepository) Get(ctx context.Context, db *sql.DB, id string) (interface{}, error) {
 	var m model.Profile
 	queries := []string{
 		`SELECT user_id, name, name_change_at FROM`,

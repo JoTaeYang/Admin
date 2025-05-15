@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -31,7 +32,7 @@ type Selector struct {
 
 type ISingleRepository interface {
 	GetTx(tx *sql.Tx, id string) (interface{}, error)
-	Get(db *sql.DB, id string) (interface{}, error)
+	Get(ctx context.Context, db *sql.DB, id string) (interface{}, error)
 	GetCache(key EModel, id string, pipe *redis.Pipeliner) (interface{}, error)
 }
 
@@ -41,7 +42,7 @@ type IOptionRepository interface {
 
 type IMultiRepository interface {
 	GetTx(tx *sql.Tx) (interface{}, error)
-	Get(db *sql.DB) (interface{}, error)
+	Get(c context.Context, db *sql.DB) (interface{}, error)
 	GetCache(key EModel, id string, pipe *redis.Pipeliner) (interface{}, error) // THINK : id를 slice로 받아야 할까? 그런 경우가 있을까.. 데이터가 없으니 너무 턱 막히네
 }
 
@@ -65,6 +66,18 @@ func (s *Selector) AddSingleWithOption(key EModel, data ISingleRepository, optio
 		Type:       SelectionTypeSingle,
 		Repository: data,
 		Option:     option,
+	}
+}
+
+func AddSingle(hub *ModelHub, key EModel, data ISingleRepository) {
+	s := hub.selector
+	if _, ok := s.selections[key]; ok {
+		return
+	}
+
+	s.selections[key] = SelectionEntry{
+		Type:       SelectionTypeSingle,
+		Repository: data,
 	}
 }
 

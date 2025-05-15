@@ -36,7 +36,7 @@ func (h *ShopHandler) Gacha(c *gin.Context) {
 		return
 	}
 
-	dataCtx, err := h.service.Gacha(c, req.Key)
+	dataCtx, err := h.service.Gacha(c, req.Key, req.Count)
 	if err != nil {
 		c.JSON(http.StatusOK, errResponse)
 		return

@@ -36,7 +36,7 @@ func (h *UserHandler) Load(c *gin.Context) {
 		return
 	}
 
-	dataCtx, err := h.service.Load(req.Uid)
+	dataCtx, err := h.service.Load(c, req.Uid)
 	if err != nil {
 		c.JSON(http.StatusOK, errResponse)
 		return
@@ -66,7 +66,7 @@ func (h *UserHandler) New(c *gin.Context) {
 		return
 	}
 
-	err = h.service.New(req.Id, req.Name)
+	err = h.service.New(c, req.Id, req.Name)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, errResponse)
 		return

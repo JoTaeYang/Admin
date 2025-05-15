@@ -22,6 +22,10 @@ func (m *Identity) GetCreate() []interface{} {
 	}
 }
 
+func (m *ModelHub) GetIdentity() (*Identity, bool) {
+	return GetFromContext[*Identity](m.DataCtx, EIdentity)
+}
+
 /*
 model 마다 어떤 DB를 읽어오는지
 

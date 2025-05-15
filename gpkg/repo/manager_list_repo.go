@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"context"
 	"database/sql"
 	"strings"
 
@@ -43,7 +44,7 @@ func (r *ManagerListRepository) GetTx(tx *sql.Tx) (interface{}, error) {
 	return mList, nil
 }
 
-func (r *ManagerListRepository) Get(db *sql.DB) (interface{}, error) {
+func (r *ManagerListRepository) Get(ctx context.Context, db *sql.DB) (interface{}, error) {
 	queries := []string{
 		`SELECT id, grade, name, created_at, updated_at FROM`,
 		bsql.AdminTable,

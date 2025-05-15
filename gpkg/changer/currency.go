@@ -25,6 +25,8 @@ func (u *Currency) Use(t pt.Currency_T, cnt int64) bool {
 		return false
 	}
 
+	currency.Count -= cnt
+
 	// DB Update
 	u.updater.AddUpsert(currency)
 

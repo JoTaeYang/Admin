@@ -17,35 +17,38 @@ func NewLoader() *Loader {
 	return &Loader{}
 }
 
-func (l *Loader) Load(selector *Selector, shardIdx int64) (map[EModel]interface{}, error) {
+func (l *Loader) Load(hub *ModelHub) error {
 
 	result := make(map[EModel]interface{}, 5)
 
-	selections := selector.GetSelect()
+	selector := hub.selector
 
+	selections := selector.GetSelect()
 	for key, entry := range selections {
 		dbKey := EModelDBGroup[key]
 
-		db := bsql.RDB.GetDB(string(dbKey), int32(shardIdx))
+		db := bsql.RDB.GetDB(string(dbKey), int32(hub.Identity.ShardIdx))
 		switch entry.Type {
 		case SelectionTypeSingle:
 			repo := entry.Repository.(ISingleRepository)
-			result[key], _ = repo.Get(db, selector.Id)
+			result[key], _ = repo.Get(hub.ctx, db, selector.Id)
 		case SelectionTypeMulti:
 			repo := entry.Repository.(IMultiRepository)
-			result[key], _ = repo.Get(db)
+			result[key], _ = repo.Get(hub.ctx, db)
 		}
 	}
 
-	return result, nil
+	MakeDataContext(hub, result)
+
+	return nil
 }
 
-func (l *Loader) LoadTx(db *sql.DB, selector *Selector) (map[EModel]interface{}, error) {
+func (l *Loader) LoadTx(hub *ModelHub) error {
 	result := make(map[EModel]interface{}, 5)
 
-	tx, err := db.Begin()
+	tx, err := hub.db.BeginTx(hub.ctx, nil)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	defer func() {
@@ -54,8 +57,8 @@ func (l *Loader) LoadTx(db *sql.DB, selector *Selector) (map[EModel]interface{},
 		}
 	}()
 
+	selector := hub.selector
 	selections := selector.GetSelect()
-
 	for key, entry := range selections {
 		switch entry.Type {
 		case SelectionTypeSingle:
@@ -63,26 +66,29 @@ func (l *Loader) LoadTx(db *sql.DB, selector *Selector) (map[EModel]interface{},
 				repo := entry.Repository.(ISingleRepository)
 				result[key], err = repo.GetTx(tx, selector.Id)
 				if err != nil {
-					return nil, err
+					return err
 				}
 			} else {
 				repo := entry.Repository.(IOptionRepository)
 				result[key], _ = repo.GetWithOption(tx, selector.Id, entry.Option)
 				if err != nil {
-					return nil, err
+					return err
 				}
 			}
 		case SelectionTypeMulti:
 			repo := entry.Repository.(IMultiRepository)
 			result[key], err = repo.GetTx(tx)
 			if err != nil {
-				return nil, err
+				return err
 			}
 		}
 	}
 
 	tx.Commit()
-	return result, nil
+
+	MakeDataContext(hub, result)
+
+	return nil
 }
 
 func (l *Loader) LoadCache(selector *Selector) (map[EModel]interface{}, error) {

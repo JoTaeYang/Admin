@@ -18,6 +18,16 @@ func NewDataContext(raw map[EModel]interface{}) *DataContext {
 	}
 }
 
+func NewDataContextHub(hub *ModelHub) *DataContext {
+	return &DataContext{
+		data: hub.DataCtx.data,
+	}
+}
+
+func MakeDataContext(hub *ModelHub, result map[EModel]interface{}) {
+	hub.DataCtx = NewDataContext(result)
+}
+
 func ConvertGRPCS(ctx *DataContext) (lists []*pt.DataItem) {
 	lists = make([]*pt.DataItem, 0, 5)
 	for _, v := range ctx.data {

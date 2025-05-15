@@ -5,6 +5,7 @@ go 1.23.5
 require (
 	github.com/JoTaeYang/Admin/gpkg v0.0.0-00010101000000-000000000000
 	github.com/gin-gonic/gin v1.10.0
+	github.com/golang/protobuf v1.5.0
 	golang.org/x/crypto v0.37.0
 )
 

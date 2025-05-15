@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"context"
 	"database/sql"
 	"strings"
 
@@ -48,7 +49,7 @@ func (r *IdentityRepository) GetTx(tx *sql.Tx, id string) (interface{}, error) {
 	return &m, nil
 }
 
-func (r *IdentityRepository) Get(db *sql.DB, id string) (interface{}, error) {
+func (r *IdentityRepository) Get(ctx context.Context, db *sql.DB, id string) (interface{}, error) {
 	var m model.Identity
 	queries := []string{
 		`SELECT id, user_id, shard_idx FROM`,
@@ -57,7 +58,7 @@ func (r *IdentityRepository) Get(db *sql.DB, id string) (interface{}, error) {
 	}
 	resultQuery := strings.Join(queries, " ")
 
-	rows := db.QueryRow(resultQuery, id)
+	rows := db.QueryRowContext(ctx, resultQuery, id)
 
 	if err := rows.Scan(&m.ID, &m.UserId, &m.ShardIdx); err != nil {
 		return nil, err

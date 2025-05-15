@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"log"
 
 	"github.com/JoTaeYang/Admin/gpkg/bsql"
 	"github.com/JoTaeYang/Admin/gpkg/config"
@@ -37,6 +38,7 @@ func (s *loginService) Login(id string, pw string) (string, error) {
 
 	results, err := s.loader.LoadTx(db, selector)
 	if err != nil {
+		log.Println(err)
 		return "", err
 	}
 
@@ -44,6 +46,7 @@ func (s *loginService) Login(id string, pw string) (string, error) {
 
 	user, ok := model.GetFromContext[*model.Manager](ctx, model.EManager)
 	if !ok {
+		log.Println("not found datas")
 		return "", errors.New("not found datas")
 	}
 
@@ -52,6 +55,7 @@ func (s *loginService) Login(id string, pw string) (string, error) {
 
 	err = bcrypt.CompareHashAndPassword(dbPWBytes, pwBytes)
 	if err != nil {
+		log.Println(err)
 		return "", err
 	}
 

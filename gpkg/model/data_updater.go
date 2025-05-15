@@ -58,8 +58,8 @@ func (u *Updater) AddDelete(key EModel, data interface{}) {
 }
 
 // todo :: 코드 수정 해보자 뭔가 지저분해
-func (u *Updater) Execute(db *sql.DB, selector *Selector) error {
-	tx, err := db.Begin()
+func (u *Updater) Execute(hub *ModelHub) error {
+	tx, err := hub.db.BeginTx(hub.ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -71,7 +71,7 @@ func (u *Updater) Execute(db *sql.DB, selector *Selector) error {
 	}()
 
 	for key, v := range u.updates {
-		entry, err := selector.GetRepository(key)
+		entry, err := hub.selector.GetRepository(key)
 		if err != nil {
 			return errors.New("Get Repository Error")
 		}

@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"context"
 	"database/sql"
 	"log"
 	"strings"
@@ -51,7 +52,7 @@ func (r *CurrencyRepository) GetCache(key model.EModel, id string, pipe *redis.P
 	return nil, nil
 }
 
-func (r *CurrencyRepository) Get(db *sql.DB, id string) (interface{}, error) {
+func (r *CurrencyRepository) Get(ctx context.Context, db *sql.DB, id string) (interface{}, error) {
 	var m model.Currency
 
 	queries := r.getSQLQuery(m.GetKey(), nil)

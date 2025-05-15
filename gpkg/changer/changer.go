@@ -20,17 +20,20 @@ type Processor struct {
 }
 
 type Changer struct {
+	hub     *model.ModelHub
 	dataCtx *model.DataContext
 	updater *model.Updater
 
 	Logger    *Logger
 	Processor *Processor
+
 	//Table 데이터도 추가
 }
 
-func MakeChanger(dataCtx *model.DataContext, act glog.Act) (*Changer, error) {
+func MakeChanger(hub *model.ModelHub, act glog.Act) (*Changer, error) {
 	changer := &Changer{
-		dataCtx: dataCtx,
+		dataCtx: hub.DataCtx,
+		hub:     hub,
 	}
 
 	changer.updater = model.NewUpdater()
@@ -42,4 +45,8 @@ func MakeChanger(dataCtx *model.DataContext, act glog.Act) (*Changer, error) {
 	}
 
 	return changer, nil
+}
+
+func (c *Changer) DBExecute() {
+	c.updater.Execute(c.hub)
 }

@@ -1,13 +1,12 @@
 package api
 
 import (
-	"github.com/JoTaeYang/Admin/gpkg/bsql"
 	"github.com/JoTaeYang/Admin/gpkg/model"
 	"github.com/JoTaeYang/Admin/gpkg/pt"
 	"github.com/JoTaeYang/Admin/gpkg/repo"
 )
 
-func MakeAccount(id, name, grade string, shardIdx int64, selector *model.Selector) error {
+func MakeAccount(id, name, grade string, hub *model.ModelHub) error {
 	// 예전에 나는 그냥 한 데이터마다 다 &Data 이렇게 해줬음.
 
 	// rdb에서 pk sk가 필요한가? 지금은 필요가 없는
@@ -19,16 +18,16 @@ func MakeAccount(id, name, grade string, shardIdx int64, selector *model.Selecto
 	// Updater가 데이터를 생성해서 집어넣음.
 	// 여기선 Repository 들을 인자로 전달해서 처리했음.
 	// 그거 그대로 쓰자 그냥
-	selector.AddSingle(model.EAuth, &repo.AuthRepository{})
-	selector.AddSingle(model.ECurrency, &repo.CurrencyRepository{})
-	selector.AddSingle(model.EProfile, &repo.ProfileRepository{})
+	model.AddSingle(hub, model.EAuth, &repo.AuthRepository{})
+	model.AddSingle(hub, model.ECurrency, &repo.CurrencyRepository{})
+	model.AddSingle(hub, model.EProfile, &repo.ProfileRepository{})
 
 	updater := model.NewUpdater()
 
 	auth := &model.Auth{
 		UserId:   id,
 		Grade:    grade,
-		ShardIdx: shardIdx,
+		ShardIdx: hub.Identity.ShardIdx,
 	}
 
 	gold := &model.Currency{
@@ -64,7 +63,7 @@ func MakeAccount(id, name, grade string, shardIdx int64, selector *model.Selecto
 	updater.AddUpsertMulti([]model.IModel{gold, freeCash, cash, petGacha})
 	updater.AddUpsert(profile)
 
-	err := updater.Execute(bsql.RDB.GetGameDB(int32(shardIdx)), selector)
+	err := updater.Execute(hub)
 	if err != nil {
 		return err
 	}

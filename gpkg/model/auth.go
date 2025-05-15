@@ -24,3 +24,7 @@ func (m *Auth) GetCreate() []interface{} {
 		m.UserId, m.Grade, m.ShardIdx,
 	}
 }
+
+func (m *ModelHub) GetAuth() (*Auth, bool) {
+	return GetFromContext[*Auth](m.DataCtx, EAuth)
+}

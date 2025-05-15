@@ -8,11 +8,12 @@ import (
 	"github.com/JoTaeYang/Admin/gpkg/gen"
 	"github.com/JoTaeYang/Admin/gpkg/model"
 	"github.com/JoTaeYang/Admin/gpkg/repo"
+	"github.com/gin-gonic/gin"
 )
 
 type AuthService interface {
-	SignUp(id string) error
-	Login(id string) (string, error)
+	SignUp(c *gin.Context, id string) error
+	Login(c *gin.Context, id string) (string, error)
 }
 
 type authService struct {
@@ -27,19 +28,20 @@ func NewAuthService(loader *model.Loader, config *config.Configs) AuthService {
 	}
 }
 
-func (s *authService) SignUp(id string) error {
-	selector := model.NewSelector(id)
+func (s *authService) SignUp(c *gin.Context, id string) error {
+	hub := model.MakeModelHubAuth(c, &repo.IdentityRepository{})
+	if hub == nil {
+		return errors.New("Make Hub Error")
+	}
 
-	selector.AddSingle(model.EIdentity, &repo.IdentityRepository{})
+	model.AddSingle(hub, model.EIdentity, &repo.IdentityRepository{})
 
-	db := bsql.RDB.GetIdentityDB()
-	results, err := s.loader.LoadTx(db, selector)
+	err := s.loader.LoadTx(hub)
 	if err != nil {
 		return err
 	}
-	ctx := model.NewDataContext(results)
 
-	_, ok := model.GetFromContext[*model.Identity](ctx, model.EIdentity)
+	_, ok := hub.GetIdentity()
 	if ok {
 		return errors.New("overlapped uuid")
 	}
@@ -55,31 +57,30 @@ func (s *authService) SignUp(id string) error {
 		ShardIdx: bsql.GenerateShardIdx(genID),
 	})
 
-	err = updater.Execute(db, selector)
+	err = updater.Execute(hub)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *authService) Login(id string) (string, error) {
-	selector := model.NewSelector(id)
+func (s *authService) Login(c *gin.Context, id string) (string, error) {
+	hub := model.MakeModelHubAuth(c, &repo.IdentityRepository{})
+	if hub == nil {
+		return "", errors.New("Make Hub Error")
+	}
 
-	selector.AddSingle(model.EIdentity, &repo.IdentityRepository{})
+	model.AddSingle(hub, model.EIdentity, &repo.IdentityRepository{})
 
-	db := bsql.RDB.GetIdentityDB()
-	results, err := s.loader.LoadTx(db, selector)
+	err := s.loader.LoadTx(hub)
 	if err != nil {
 		return "", err
 	}
-	ctx := model.NewDataContext(results)
 
-	identity, ok := model.GetFromContext[*model.Identity](ctx, model.EIdentity)
+	_, ok := hub.GetIdentity()
 	if !ok {
 		return "", errors.New("not found id")
 	}
-
-	_ = identity
 
 	return gen.GenerateJWT(id, s.config.GetSecretKey())
 }
