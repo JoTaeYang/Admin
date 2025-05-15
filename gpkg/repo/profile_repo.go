@@ -41,7 +41,10 @@ func (r *ProfileRepository) Get(ctx context.Context, db *sql.DB, id string) (int
 
 	resultQuery := strings.Join(queries, " ")
 
-	rows := db.QueryRow(resultQuery, id)
+	rows := db.QueryRowContext(ctx, resultQuery, id)
+	if ctx.Err() != nil {
+		return m, ctx.Err()
+	}
 
 	if err := rows.Scan(&m.UserId, &m.Name, &m.NameChangeAt); err != nil {
 		return nil, err
@@ -50,7 +53,7 @@ func (r *ProfileRepository) Get(ctx context.Context, db *sql.DB, id string) (int
 	return &m, nil
 }
 
-func (r *ProfileRepository) GetTx(tx *sql.Tx, id string) (interface{}, error) {
+func (r *ProfileRepository) GetTx(ctx context.Context, tx *sql.Tx, id string) (interface{}, error) {
 	var m model.Profile
 	queries := []string{
 		`SELECT user_id, name, name_change_at FROM`,
@@ -60,7 +63,10 @@ func (r *ProfileRepository) GetTx(tx *sql.Tx, id string) (interface{}, error) {
 
 	resultQuery := strings.Join(queries, " ")
 
-	rows := tx.QueryRow(resultQuery, id)
+	rows := tx.QueryRowContext(ctx, resultQuery, id)
+	if ctx.Err() != nil {
+		return m, ctx.Err()
+	}
 
 	if err := rows.Scan(&m.UserId, &m.Name, &m.NameChangeAt); err != nil {
 		return nil, err
@@ -68,7 +74,7 @@ func (r *ProfileRepository) GetTx(tx *sql.Tx, id string) (interface{}, error) {
 	return &m, nil
 }
 
-func (r *ProfileRepository) Update(tx *sql.Tx, data model.IModel) error {
+func (r *ProfileRepository) Update(ctx context.Context, tx *sql.Tx, data model.IModel) error {
 	queries := []string{
 		`INSERT INTO`,
 		data.GetKey(),
@@ -80,7 +86,7 @@ func (r *ProfileRepository) Update(tx *sql.Tx, data model.IModel) error {
 	}
 	resultQuery := strings.Join(queries, " ")
 
-	_, err := tx.Exec(resultQuery, data.GetCreate()...)
+	_, err := tx.ExecContext(ctx, resultQuery, data.GetCreate()...)
 	if err != nil {
 		return err
 	}

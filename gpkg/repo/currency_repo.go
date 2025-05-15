@@ -59,12 +59,16 @@ func (r *CurrencyRepository) Get(ctx context.Context, db *sql.DB, id string) (in
 
 	resultQuery := strings.Join(queries, " ")
 
-	rows, err := db.Query(resultQuery)
+	rows, err := db.QueryContext(ctx, resultQuery)
 	if err != nil {
 		return nil, err
 	}
-
 	defer rows.Close()
+
+	if ctx.Err() != nil {
+		return m, ctx.Err()
+	}
+
 	mList := make([]*model.Currency, 0, 5)
 	for rows.Next() {
 		m := &model.Currency{}
@@ -77,18 +81,22 @@ func (r *CurrencyRepository) Get(ctx context.Context, db *sql.DB, id string) (in
 	return mList, nil
 }
 
-func (r *CurrencyRepository) GetTx(tx *sql.Tx, id string) (interface{}, error) {
+func (r *CurrencyRepository) GetTx(ctx context.Context, tx *sql.Tx, id string) (interface{}, error) {
 	var m model.Currency
 
 	queries := r.getSQLQuery(m.GetKey(), nil)
 
 	resultQuery := strings.Join(queries, " ")
 
-	rows, err := tx.Query(resultQuery, id)
+	rows, err := tx.QueryContext(ctx, resultQuery, id)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
+
+	if ctx.Err() != nil {
+		return m, ctx.Err()
+	}
 
 	mList := make([]*model.Currency, 0, 5)
 	for rows.Next() {
@@ -102,7 +110,7 @@ func (r *CurrencyRepository) GetTx(tx *sql.Tx, id string) (interface{}, error) {
 	return mList, nil
 }
 
-func (r *CurrencyRepository) GetWithOption(tx *sql.Tx, id string, option *model.QueryOption) (interface{}, error) {
+func (r *CurrencyRepository) GetWithOption(ctx context.Context, tx *sql.Tx, id string, option *model.QueryOption) (interface{}, error) {
 	var m model.Currency
 
 	queries := r.getSQLQuery(m.GetKey(), option)
@@ -117,13 +125,16 @@ func (r *CurrencyRepository) GetWithOption(tx *sql.Tx, id string, option *model.
 		}
 	}
 
-	rows, err := tx.Query(resultQuery, args...)
+	rows, err := tx.QueryContext(ctx, resultQuery, args...)
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
-
 	defer rows.Close()
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
+	}
+
 	mList := make([]*model.Currency, 0, 5)
 	for rows.Next() {
 		m := &model.Currency{}
@@ -136,7 +147,7 @@ func (r *CurrencyRepository) GetWithOption(tx *sql.Tx, id string, option *model.
 	return mList, nil
 }
 
-func (r *CurrencyRepository) Update(tx *sql.Tx, data model.IModel) error {
+func (r *CurrencyRepository) Update(ctx context.Context, tx *sql.Tx, data model.IModel) error {
 	queries := []string{
 		`INSERT INTO`,
 		data.GetKey(),
@@ -145,7 +156,7 @@ func (r *CurrencyRepository) Update(tx *sql.Tx, data model.IModel) error {
 	}
 	resultQuery := strings.Join(queries, " ")
 
-	_, err := tx.Exec(resultQuery, data.GetCreate()...)
+	_, err := tx.ExecContext(ctx, resultQuery, data.GetCreate()...)
 	if err != nil {
 		return err
 	}

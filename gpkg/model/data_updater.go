@@ -80,7 +80,7 @@ func (u *Updater) Execute(hub *ModelHub) error {
 		case UpdaterUpsert:
 			if updater, ok := entry.Repository.(IUpdaterRepository); ok {
 				if modelData, ok := v.Data.(IModel); ok {
-					err = updater.Update(tx, modelData)
+					err = updater.Update(hub.ctx, tx, modelData)
 					if err != nil {
 						log.Println(err)
 						return err
@@ -88,7 +88,7 @@ func (u *Updater) Execute(hub *ModelHub) error {
 				} else {
 					if modelList, ok := v.Data.([]IModel); ok {
 						for _, v := range modelList {
-							err = updater.Update(tx, v)
+							err = updater.Update(hub.ctx, tx, v)
 							if err != nil {
 								log.Println(err)
 								return err

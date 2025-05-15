@@ -31,23 +31,23 @@ type Selector struct {
 }
 
 type ISingleRepository interface {
-	GetTx(tx *sql.Tx, id string) (interface{}, error)
+	GetTx(ctx context.Context, tx *sql.Tx, id string) (interface{}, error)
 	Get(ctx context.Context, db *sql.DB, id string) (interface{}, error)
 	GetCache(key EModel, id string, pipe *redis.Pipeliner) (interface{}, error)
 }
 
 type IOptionRepository interface {
-	GetWithOption(tx *sql.Tx, id string, option *QueryOption) (interface{}, error)
+	GetWithOption(ctx context.Context, tx *sql.Tx, id string, option *QueryOption) (interface{}, error)
 }
 
 type IMultiRepository interface {
-	GetTx(tx *sql.Tx) (interface{}, error)
+	GetTx(ctx context.Context, tx *sql.Tx) (interface{}, error)
 	Get(c context.Context, db *sql.DB) (interface{}, error)
 	GetCache(key EModel, id string, pipe *redis.Pipeliner) (interface{}, error) // THINK : id를 slice로 받아야 할까? 그런 경우가 있을까.. 데이터가 없으니 너무 턱 막히네
 }
 
 type IUpdaterRepository interface {
-	Update(tx *sql.Tx, data IModel) error
+	Update(ctx context.Context, tx *sql.Tx, data IModel) error
 }
 
 func NewSelector(id string) *Selector {

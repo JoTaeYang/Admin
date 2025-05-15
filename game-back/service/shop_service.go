@@ -21,8 +21,8 @@ type shopService struct {
 	Loader *model.Loader
 }
 
-func NewShopService(Loader *model.Loader, config *config.Configs) UserService {
-	return &userService{
+func NewShopService(Loader *model.Loader, config *config.Configs) ShopService {
+	return &shopService{
 		Loader: Loader,
 		config: config,
 	}

@@ -40,7 +40,11 @@ func (r *AuthRepository) Get(ctx context.Context, db *sql.DB, id string) (interf
 	}
 	resultQuery := strings.Join(queries, " ")
 
-	rows := db.QueryRow(resultQuery, id)
+	rows := db.QueryRowContext(ctx, resultQuery, id)
+	if ctx.Err() != nil {
+		return m, ctx.Err()
+	}
+
 	if err := rows.Scan(&m.ID, &m.UserId); err != nil {
 		return nil, err
 	}
@@ -48,7 +52,7 @@ func (r *AuthRepository) Get(ctx context.Context, db *sql.DB, id string) (interf
 	return &m, nil
 }
 
-func (r *AuthRepository) GetTx(tx *sql.Tx, id string) (interface{}, error) {
+func (r *AuthRepository) GetTx(ctx context.Context, tx *sql.Tx, id string) (interface{}, error) {
 	var m model.Identity
 	queries := []string{
 		`SELECT id, user_id, shard_idx FROM`,
@@ -57,16 +61,20 @@ func (r *AuthRepository) GetTx(tx *sql.Tx, id string) (interface{}, error) {
 	}
 	resultQuery := strings.Join(queries, " ")
 
-	rows := tx.QueryRow(resultQuery, id)
+	rows := tx.QueryRowContext(ctx, resultQuery, id)
 
 	if err := rows.Scan(&m.ID, &m.UserId, &m.ShardIdx); err != nil {
 		return nil, err
 	}
 
+	if ctx.Err() != nil {
+		return m, ctx.Err()
+	}
+
 	return &m, nil
 }
 
-func (r *AuthRepository) Update(tx *sql.Tx, data model.IModel) error {
+func (r *AuthRepository) Update(ctx context.Context, tx *sql.Tx, data model.IModel) error {
 	queries := []string{
 		`INSERT INTO`,
 		data.GetKey(),
@@ -74,7 +82,7 @@ func (r *AuthRepository) Update(tx *sql.Tx, data model.IModel) error {
 	}
 	resultQuery := strings.Join(queries, " ")
 
-	_, err := tx.Exec(resultQuery, data.GetCreate()...)
+	_, err := tx.ExecContext(ctx, resultQuery, data.GetCreate()...)
 	if err != nil {
 		return err
 	}

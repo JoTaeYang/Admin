@@ -31,7 +31,7 @@ func (r *IdentityRepository) GetCache(key model.EModel, id string, pipe *redis.P
 	return nil, nil
 }
 
-func (r *IdentityRepository) GetTx(tx *sql.Tx, id string) (interface{}, error) {
+func (r *IdentityRepository) GetTx(ctx context.Context, tx *sql.Tx, id string) (interface{}, error) {
 	var m model.Identity
 	queries := []string{
 		`SELECT id, user_id, shard_idx FROM`,
@@ -40,7 +40,10 @@ func (r *IdentityRepository) GetTx(tx *sql.Tx, id string) (interface{}, error) {
 	}
 	resultQuery := strings.Join(queries, " ")
 
-	rows := tx.QueryRow(resultQuery, id)
+	rows := tx.QueryRowContext(ctx, resultQuery, id)
+	if ctx.Err() != nil {
+		return m, ctx.Err()
+	}
 
 	if err := rows.Scan(&m.ID, &m.UserId, &m.ShardIdx); err != nil {
 		return nil, err
@@ -59,6 +62,9 @@ func (r *IdentityRepository) Get(ctx context.Context, db *sql.DB, id string) (in
 	resultQuery := strings.Join(queries, " ")
 
 	rows := db.QueryRowContext(ctx, resultQuery, id)
+	if ctx.Err() != nil {
+		return m, ctx.Err()
+	}
 
 	if err := rows.Scan(&m.ID, &m.UserId, &m.ShardIdx); err != nil {
 		return nil, err
@@ -67,7 +73,7 @@ func (r *IdentityRepository) Get(ctx context.Context, db *sql.DB, id string) (in
 	return &m, nil
 }
 
-func (r *IdentityRepository) Update(tx *sql.Tx, data model.IModel) error {
+func (r *IdentityRepository) Update(ctx context.Context, tx *sql.Tx, data model.IModel) error {
 	queries := []string{
 		`INSERT INTO`,
 		data.GetKey(),
@@ -75,7 +81,7 @@ func (r *IdentityRepository) Update(tx *sql.Tx, data model.IModel) error {
 	}
 	resultQuery := strings.Join(queries, " ")
 
-	_, err := tx.Exec(resultQuery, data.GetCreate()...)
+	_, err := tx.ExecContext(ctx, resultQuery, data.GetCreate()...)
 	if err != nil {
 		return err
 	}

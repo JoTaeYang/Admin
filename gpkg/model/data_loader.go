@@ -64,20 +64,20 @@ func (l *Loader) LoadTx(hub *ModelHub) error {
 		case SelectionTypeSingle:
 			if entry.Option == nil {
 				repo := entry.Repository.(ISingleRepository)
-				result[key], err = repo.GetTx(tx, selector.Id)
+				result[key], err = repo.GetTx(hub.ctx, tx, selector.Id)
 				if err != nil {
 					return err
 				}
 			} else {
 				repo := entry.Repository.(IOptionRepository)
-				result[key], _ = repo.GetWithOption(tx, selector.Id, entry.Option)
+				result[key], _ = repo.GetWithOption(hub.ctx, tx, selector.Id, entry.Option)
 				if err != nil {
 					return err
 				}
 			}
 		case SelectionTypeMulti:
 			repo := entry.Repository.(IMultiRepository)
-			result[key], err = repo.GetTx(tx)
+			result[key], err = repo.GetTx(hub.ctx, tx)
 			if err != nil {
 				return err
 			}

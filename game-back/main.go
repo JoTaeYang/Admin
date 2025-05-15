@@ -35,6 +35,8 @@ func InitRouter() *gin.Engine {
 
 	loader := model.NewLoader()
 	svc := service.NewUserService(loader, &cfg)
+	shopSvc := service.NewShopService(loader, &cfg)
+
 	url := "/big/game"
 
 	UserRouter := r.Group(url + "/user")
@@ -42,6 +44,12 @@ func InitRouter() *gin.Engine {
 		h := handler.NewUserHandler(svc)
 		UserRouter.POST("/load", h.Load)
 		UserRouter.POST("/new", h.New)
+	}
+
+	ShopRouter := r.Group(url + "/shop")
+	{
+		h := handler.NewShopHandler(shopSvc)
+		ShopRouter.POST("/gacha", h.Gacha)
 	}
 
 	return r
