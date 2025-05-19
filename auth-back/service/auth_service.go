@@ -8,7 +8,6 @@ import (
 	"github.com/JoTaeYang/Admin/gpkg/gen"
 	"github.com/JoTaeYang/Admin/gpkg/glog"
 	"github.com/JoTaeYang/Admin/gpkg/model"
-	"github.com/JoTaeYang/Admin/gpkg/repo"
 	rf "github.com/JoTaeYang/Admin/gpkg/repo/factory"
 	"github.com/gin-gonic/gin"
 )
@@ -33,7 +32,8 @@ func NewAuthService(loader *model.Loader, config *config.Configs, factory rf.Rep
 }
 
 func (s *authService) SignUp(c *gin.Context, id string) error {
-	hub := model.MakeModelHubAuth(c, id, &repo.IdentityRepository{})
+	identityRepo := s.factory.Identity()
+	hub := model.MakeModelHubAuth(c, id, &identityRepo)
 	if hub == nil {
 		return errors.New("Make Hub Error")
 	}
@@ -58,7 +58,8 @@ func (s *authService) SignUp(c *gin.Context, id string) error {
 }
 
 func (s *authService) Login(c *gin.Context, id string) (string, error) {
-	hub := model.MakeModelHub(c, &repo.IdentityRepository{})
+	identityRepo := s.factory.Identity()
+	hub := model.MakeModelHubAuth(c, id, &identityRepo)
 	if hub == nil {
 		return "", errors.New("Make Hub Error")
 	}

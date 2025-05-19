@@ -6,7 +6,6 @@ import (
 	"github.com/JoTaeYang/Admin/gpkg/api"
 	"github.com/JoTaeYang/Admin/gpkg/config"
 	"github.com/JoTaeYang/Admin/gpkg/model"
-	"github.com/JoTaeYang/Admin/gpkg/repo"
 	rf "github.com/JoTaeYang/Admin/gpkg/repo/factory"
 	"github.com/gin-gonic/gin"
 )
@@ -31,14 +30,19 @@ func NewUserService(Loader *model.Loader, config *config.Configs, factory rf.Rep
 }
 
 func (s *userService) Load(c *gin.Context, id string) (*model.DataContext, error) {
-	hub := model.MakeModelHub(c, &repo.IdentityRepository{})
+	identityRepo := s.factory.Identity()
+	authRepo := s.factory.Auth()
+	currencyRepo := s.factory.Currency()
+	profileRepo := s.factory.Profile()
+
+	hub := model.MakeModelHub(c, &identityRepo)
 	if hub == nil {
 		return nil, errors.New("Make Hub Error")
 	}
 
-	model.AddSingle(hub, model.EAuth, &repo.AuthRepository{})
-	model.AddSingle(hub, model.ECurrency, &repo.CurrencyRepository{})
-	model.AddSingle(hub, model.EProfile, &repo.ProfileRepository{})
+	model.AddSingle(hub, model.EAuth, &authRepo)
+	model.AddSingle(hub, model.ECurrency, &currencyRepo)
+	model.AddSingle(hub, model.EProfile, &profileRepo)
 
 	//selector.AddSingleWithOption(model.ECurrency, &repo.CurrencyRepository{}, &model.QueryOption{Params: []string{"1", "2"}})
 
@@ -51,12 +55,14 @@ func (s *userService) Load(c *gin.Context, id string) (*model.DataContext, error
 }
 
 func (s *userService) New(c *gin.Context, id, name string) error {
-	hub := model.MakeModelHub(c, &repo.IdentityRepository{})
+	identityRepo := s.factory.Identity()
+	authRepo := s.factory.Auth()
+	hub := model.MakeModelHub(c, &identityRepo)
 	if hub == nil {
 		return errors.New("Make Hub Error")
 	}
 
-	model.AddSingle(hub, model.EAuth, &repo.AuthRepository{})
+	model.AddSingle(hub, model.EAuth, &authRepo)
 	err := s.Loader.Load(hub)
 	if err != nil {
 		return err
