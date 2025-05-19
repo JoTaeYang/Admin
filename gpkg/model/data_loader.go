@@ -32,9 +32,9 @@ func (l *Loader) Load(hub *ModelHub) error {
 		case SelectionTypeSingle:
 			repo := entry.Repository.(ISingleRepository)
 			result[key], _ = repo.Get(hub.ctx, db, selector.Id)
-		case SelectionTypeMulti:
-			repo := entry.Repository.(IMultiRepository)
-			result[key], _ = repo.Get(hub.ctx, db)
+			// case SelectionTypeRange:
+			// 	repo := entry.Repository.(IMultiRepository)
+			// 	result[key], _ = repo.Get(hub.ctx, db)
 		}
 	}
 
@@ -75,12 +75,12 @@ func (l *Loader) LoadTx(hub *ModelHub) error {
 					return err
 				}
 			}
-		case SelectionTypeMulti:
-			repo := entry.Repository.(IMultiRepository)
-			result[key], err = repo.GetTx(hub.ctx, tx)
-			if err != nil {
-				return err
-			}
+		case SelectionTypeRange:
+			// repo := entry.Repository.(IMultiRepository)
+			// result[key], err = repo.GetTx(hub.ctx, tx)
+			// if err != nil {
+			// 	return err
+			// }
 		}
 	}
 
@@ -107,12 +107,12 @@ func (l *Loader) LoadCache(selector *Selector) (map[EModel]interface{}, error) {
 			if err != nil {
 				return nil, err
 			}
-		case SelectionTypeMulti:
-			repo := entry.Repository.(IMultiRepository)
-			result[key], err = repo.GetCache(key, selector.Id, &pipe)
-			if err != nil {
-				return nil, err
-			}
+		case SelectionTypeRange:
+			// repo := entry.Repository.(IMultiRepository)
+			// result[key], err = repo.GetCache(key, selector.Id, &pipe)
+			// if err != nil {
+			// 	return nil, err
+			// }
 		}
 	}
 

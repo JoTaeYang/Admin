@@ -3,11 +3,13 @@ package service
 import (
 	"errors"
 
-	"github.com/JoTaeYang/Admin/gpkg/bsql"
+	"github.com/JoTaeYang/Admin/gpkg/changer"
 	"github.com/JoTaeYang/Admin/gpkg/config"
 	"github.com/JoTaeYang/Admin/gpkg/gen"
+	"github.com/JoTaeYang/Admin/gpkg/glog"
 	"github.com/JoTaeYang/Admin/gpkg/model"
 	"github.com/JoTaeYang/Admin/gpkg/repo"
+	rf "github.com/JoTaeYang/Admin/gpkg/repo/factory"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,14 +19,16 @@ type AuthService interface {
 }
 
 type authService struct {
-	config *config.Configs
-	loader *model.Loader
+	config  *config.Configs
+	loader  *model.Loader
+	factory rf.RepoFactory
 }
 
-func NewAuthService(loader *model.Loader, config *config.Configs) AuthService {
+func NewAuthService(loader *model.Loader, config *config.Configs, factory rf.RepoFactory) AuthService {
 	return &authService{
-		loader: loader,
-		config: config,
+		loader:  loader,
+		config:  config,
+		factory: factory,
 	}
 }
 
@@ -38,21 +42,18 @@ func (s *authService) SignUp(c *gin.Context, id string) error {
 		return errors.New("overlapped uuid")
 	}
 
-	updater := model.NewUpdater()
+	cha, err := changer.MakeChanger(hub, s.factory, glog.Act_Auth)
+	if err != nil {
+		return errors.New("changer make error")
+	}
 
-	genID := gen.SnowFlake()
+	cha.Auth.New(id)
 
-	// TODO :: AddUpsert를 Changer에서 해줘도 될 거 같다.
-	updater.AddUpsert(&model.Identity{
-		ID:       genID,
-		UserId:   id,
-		ShardIdx: bsql.GenerateShardIdx(genID),
-	})
-
-	err := updater.Execute(hub)
+	err = cha.DBExecute()
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 

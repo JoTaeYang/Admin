@@ -7,6 +7,7 @@ import (
 	"github.com/JoTaeYang/Admin/gpkg/config"
 	"github.com/JoTaeYang/Admin/gpkg/model"
 	"github.com/JoTaeYang/Admin/gpkg/repo"
+	rf "github.com/JoTaeYang/Admin/gpkg/repo/factory"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,14 +17,16 @@ type UserService interface {
 }
 
 type userService struct {
-	config *config.Configs
-	Loader *model.Loader
+	config  *config.Configs
+	Loader  *model.Loader
+	factory rf.RepoFactory
 }
 
-func NewUserService(Loader *model.Loader, config *config.Configs) UserService {
+func NewUserService(Loader *model.Loader, config *config.Configs, factory rf.RepoFactory) UserService {
 	return &userService{
-		Loader: Loader,
-		config: config,
+		Loader:  Loader,
+		config:  config,
+		factory: factory,
 	}
 }
 
@@ -64,7 +67,7 @@ func (s *userService) New(c *gin.Context, id, name string) error {
 		return errors.New("overlapped auth")
 	}
 
-	err = api.MakeAccount(id, name, "user", hub)
+	err = api.MakeAccount(id, name, "user", hub, s.factory)
 	if err != nil {
 		return err
 	}

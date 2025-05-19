@@ -9,6 +9,8 @@ import (
 	"github.com/JoTaeYang/Admin/gpkg/model"
 	"github.com/JoTaeYang/Admin/gpkg/pt"
 	"github.com/JoTaeYang/Admin/gpkg/repo"
+	rf "github.com/JoTaeYang/Admin/gpkg/repo/factory"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,14 +19,16 @@ type ShopService interface {
 }
 
 type shopService struct {
-	config *config.Configs
-	Loader *model.Loader
+	config  *config.Configs
+	Loader  *model.Loader
+	factory rf.RepoFactory
 }
 
-func NewShopService(Loader *model.Loader, config *config.Configs) ShopService {
+func NewShopService(Loader *model.Loader, config *config.Configs, factory rf.RepoFactory) ShopService {
 	return &shopService{
-		Loader: Loader,
-		config: config,
+		Loader:  Loader,
+		config:  config,
+		factory: factory,
 	}
 }
 
@@ -43,7 +47,7 @@ func (s *shopService) Gacha(c *gin.Context, gachaKey string, count int32) (*mode
 		return nil, err
 	}
 
-	cha, err := changer.MakeChanger(hub, glog.Act_Shop)
+	cha, err := changer.MakeChanger(hub, s.factory, glog.Act_Shop)
 	if err != nil {
 		return nil, errors.New("changer make error")
 	}

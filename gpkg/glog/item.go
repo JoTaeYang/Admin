@@ -3,7 +3,8 @@ package glog
 type Act int32
 
 const (
-	Act_Shop = 1000
+	Act_Auth = 1000
+	Act_Shop = 1100
 )
 
 type MetaItem struct {

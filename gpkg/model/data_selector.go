@@ -12,7 +12,7 @@ type SelectionType int
 
 const (
 	SelectionTypeSingle SelectionType = iota
-	SelectionTypeMulti
+	SelectionTypeRange
 )
 
 type QueryOption struct {
@@ -38,12 +38,6 @@ type ISingleRepository interface {
 
 type IOptionRepository interface {
 	GetWithOption(ctx context.Context, tx *sql.Tx, id string, option *QueryOption) (interface{}, error)
-}
-
-type IMultiRepository interface {
-	GetTx(ctx context.Context, tx *sql.Tx) (interface{}, error)
-	Get(c context.Context, db *sql.DB) (interface{}, error)
-	GetCache(key EModel, id string, pipe *redis.Pipeliner) (interface{}, error) // THINK : id를 slice로 받아야 할까? 그런 경우가 있을까.. 데이터가 없으니 너무 턱 막히네
 }
 
 type IUpdaterRepository interface {
@@ -92,12 +86,18 @@ func (s *Selector) AddSingle(key EModel, data ISingleRepository) {
 	}
 }
 
-func (s *Selector) AddMulti(key EModel, data IMultiRepository) {
-	s.selections[key] = SelectionEntry{
-		Type:       SelectionTypeMulti,
-		Repository: data,
-	}
-}
+// type IMultiRepository interface {
+// 	GetTx(ctx context.Context, tx *sql.Tx) (interface{}, error)
+// 	Get(c context.Context, db *sql.DB) (interface{}, error)
+// 	GetCache(key EModel, id string, pipe *redis.Pipeliner) (interface{}, error) // THINK : id를 slice로 받아야 할까? 그런 경우가 있을까.. 데이터가 없으니 너무 턱 막히네
+// }
+
+// func (s *Selector) AddMulti(key EModel, data IMultiRepository) {
+// 	s.selections[key] = SelectionEntry{
+// 		Type:       SelectionTypeRange,
+// 		Repository: data,
+// 	}
+// }
 
 func (s *Selector) GetSelect() map[EModel]SelectionEntry {
 	return s.selections

@@ -3,6 +3,7 @@ package changer
 import (
 	"github.com/JoTaeYang/Admin/gpkg/glog"
 	"github.com/JoTaeYang/Admin/gpkg/model"
+	rf "github.com/JoTaeYang/Admin/gpkg/repo/factory"
 )
 
 type Logger = glog.Logger
@@ -16,24 +17,27 @@ type Logger = glog.Logger
 type Processor struct {
 	*Changer
 
+	Auth     *Auth
 	Currecny *Currency
 }
 
 type Changer struct {
+	*Processor
+
 	hub     *model.ModelHub
 	dataCtx *model.DataContext
 	updater *model.Updater
 
-	Logger    *Logger
-	Processor *Processor
-
+	Logger  *Logger
+	Factory rf.RepoFactory
 	//Table 데이터도 추가
 }
 
-func MakeChanger(hub *model.ModelHub, act glog.Act) (*Changer, error) {
+func MakeChanger(hub *model.ModelHub, factory rf.RepoFactory, act glog.Act) (*Changer, error) {
 	changer := &Changer{
 		dataCtx: hub.DataCtx,
 		hub:     hub,
+		Factory: factory,
 	}
 
 	changer.updater = model.NewUpdater()
@@ -42,11 +46,12 @@ func MakeChanger(hub *model.ModelHub, act glog.Act) (*Changer, error) {
 		Changer: changer,
 
 		Currecny: newCurrency(changer),
+		Auth:     newAuth(changer),
 	}
 
 	return changer, nil
 }
 
-func (c *Changer) DBExecute() {
-	c.updater.Execute(c.hub)
+func (c *Changer) DBExecute() error {
+	return c.updater.Execute(c.hub)
 }

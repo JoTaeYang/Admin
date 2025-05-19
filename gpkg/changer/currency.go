@@ -27,8 +27,9 @@ func (u *Currency) Use(t pt.Currency_T, cnt int64) bool {
 
 	currency.Count -= cnt
 
+	repo := u.Factory.Currency()
 	// DB Update
-	u.updater.AddUpsert(currency)
+	u.updater.AddUpsert(currency, &repo)
 
 	// Meta Item Log 추가
 

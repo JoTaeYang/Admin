@@ -5,6 +5,7 @@ import (
 	"github.com/JoTaeYang/Admin/game-back/service"
 	mw "github.com/JoTaeYang/Admin/gpkg/middleware"
 	"github.com/JoTaeYang/Admin/gpkg/model"
+	rf "github.com/JoTaeYang/Admin/gpkg/repo/factory"
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,8 +35,9 @@ func InitRouter() *gin.Engine {
 	r.Use(mw.AuthMiddleware(&cfg))
 
 	loader := model.NewLoader()
-	svc := service.NewUserService(loader, &cfg)
-	shopSvc := service.NewShopService(loader, &cfg)
+	factory := rf.NewFactory()
+	svc := service.NewUserService(loader, &cfg, factory)
+	shopSvc := service.NewShopService(loader, &cfg, factory)
 
 	url := "/big/game"
 

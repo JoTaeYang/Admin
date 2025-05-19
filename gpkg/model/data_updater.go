@@ -2,7 +2,6 @@ package model
 
 import (
 	"database/sql"
-	"errors"
 	"log"
 )
 
@@ -22,8 +21,9 @@ const (
 )
 
 type UpdaterEntry struct {
-	Type UpdaterType
-	Data interface{}
+	Type       UpdaterType
+	Repository IUpdaterRepository
+	Data       interface{}
 }
 
 type Updater struct {
@@ -36,17 +36,22 @@ func NewUpdater() *Updater {
 	}
 }
 
-func (u *Updater) AddUpsert(data IModel) {
+func (u *Updater) AddUpsert(data IModel, repo IUpdaterRepository) {
 	u.updates[data.GetEModel()] = UpdaterEntry{
-		Type: UpdaterUpsert,
-		Data: data,
+		Type:       UpdaterUpsert,
+		Repository: repo,
+		Data:       data,
 	}
 }
 
-func (u *Updater) AddUpsertMulti(data []IModel) {
+func (u *Updater) AddUpsertMulti(data []IModel, repo IUpdaterRepository) {
+	// TODO :: KEY에 덮어씌웠을 때, 주의 사항
+	// 똑같은 데이터를 두 번 Upsert 했을 때, 이전에 했던 것이 사라지게 된다.
+	// 변경이 필요함.
 	u.updates[data[0].GetEModel()] = UpdaterEntry{
-		Type: UpdaterUpsert,
-		Data: data,
+		Type:       UpdaterUpsert,
+		Data:       data,
+		Repository: repo,
 	}
 }
 
@@ -70,15 +75,11 @@ func (u *Updater) Execute(hub *ModelHub) error {
 		}
 	}()
 
-	for key, v := range u.updates {
-		entry, err := hub.selector.GetRepository(key)
-		if err != nil {
-			return errors.New("Get Repository Error")
-		}
-
+	for _, v := range u.updates {
+		repository := v.Repository
 		switch v.Type {
 		case UpdaterUpsert:
-			if updater, ok := entry.Repository.(IUpdaterRepository); ok {
+			if updater, ok := repository.(IUpdaterRepository); ok {
 				if modelData, ok := v.Data.(IModel); ok {
 					err = updater.Update(hub.ctx, tx, modelData)
 					if err != nil {
@@ -99,7 +100,7 @@ func (u *Updater) Execute(hub *ModelHub) error {
 			}
 
 		case UpdaterDelete:
-			if updater, ok := entry.Repository.(IUpdaterRepository); ok {
+			if updater, ok := repository.(IUpdaterRepository); ok {
 				_ = updater
 			}
 		}

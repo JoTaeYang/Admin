@@ -4,6 +4,7 @@ import (
 	"github.com/JoTaeYang/Admin/auth-back/handler"
 	"github.com/JoTaeYang/Admin/auth-back/service"
 	"github.com/JoTaeYang/Admin/gpkg/model"
+	rf "github.com/JoTaeYang/Admin/gpkg/repo/factory"
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,7 +33,8 @@ func InitRouter() *gin.Engine {
 	r.Use(CORSM())
 
 	loader := model.NewLoader()
-	svc := service.NewAuthService(loader, &cfg)
+	factory := rf.NewFactory()
+	svc := service.NewAuthService(loader, &cfg, factory)
 	url := "/big/auth"
 
 	AuthRouter := r.Group(url)
